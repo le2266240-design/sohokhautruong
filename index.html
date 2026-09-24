@@ -133,6 +133,7 @@ body{
 .btn:hover{background:#31432f;}
 .btn.secondary{background:transparent;color:var(--maroon);border:1px solid var(--maroon);}
 .btn.secondary:hover{background:#faf1ef;}
+#modeSwitch .btn.secondary.active{background:var(--maroon);color:#fff;}
 
 /* member table */
 .members{padding:6px 0;overflow-x:auto;}
@@ -277,6 +278,7 @@ body.locked #mainApp{display:none;}
     <div>
       <h1>Sổ Hộ Khẩu Điện Tử</h1>
       <p>Quản lý thành viên theo hộ — dữ liệu chỉ hiện sau khi đăng nhập & được cấp quyền qua cloud (bấm "☁️ Đồng bộ").</p>
+      <div id="roleBanner" style="display:none;margin-top:8px;padding:7px 12px;background:#FFF3D6;border:1px solid var(--gold);border-radius:8px;font-size:12px;color:var(--maroon-dark);font-weight:600;"></div>
     </div>
     <div class="search-box">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -303,7 +305,7 @@ body.locked #mainApp{display:none;}
           <h2 id="mainTitle">Chọn một hộ để xem</h2>
           <div class="sub" id="mainSub">hoặc tìm kiếm ở góc trên</div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn secondary" id="printBtn">In tất cả</button>
           <button class="btn secondary" id="viewOnlyBtn">📄 Tạo bản chỉ xem</button>
           <button class="btn secondary" id="exportBtn">💾 Lưu vào máy</button>
@@ -312,6 +314,12 @@ body.locked #mainApp{display:none;}
           <button class="btn secondary" id="importBtn">Nhập dữ liệu</button>
           <button class="btn" id="addBtn">+ Thêm thành viên</button>
         </div>
+      </div>
+      <div id="modeSwitch" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--paper-2);border-bottom:1px solid var(--line);font-size:12.5px;">
+        <button class="btn secondary" id="modeMainBtn" style="padding:6px 12px;font-size:12.5px;">📋 Danh sách chính</button>
+        <button class="btn secondary" id="modeDraftBtn" style="padding:6px 12px;font-size:12.5px;">📝 Nháp của tôi</button>
+        <button class="btn secondary" id="modeReviewBtn" style="padding:6px 12px;font-size:12.5px;display:none;">🗂 Chờ duyệt</button>
+        <span id="modeBanner" style="color:var(--ink-soft);margin-left:6px;"></span>
       </div>
       <div id="mainContent"></div>
     </div>
@@ -347,7 +355,7 @@ body.locked #mainApp{display:none;}
       <button class="btn" id="syncLoginBtn">Đăng nhập & đồng bộ</button>
     </div>
     <div style="margin-top:12px;padding:10px 12px;background:var(--paper-2);border-radius:10px;font-size:11.5px;line-height:1.5;color:var(--ink-soft);">
-      <b>Lưu ý:</b> file này không còn chứa sẵn dữ liệu. Sau khi đăng nhập, dữ liệu chỉ hiện ra nếu tài khoản của bạn đã được chủ sổ cấp quyền (thêm vào danh sách "editors" trên Firebase Console). Chủ sổ có thể thu hồi quyền của bất kỳ ai bất cứ lúc nào từ Console, không cần đổi mật khẩu hay gửi lại file.
+      <b>Lưu ý:</b> file này không còn chứa sẵn dữ liệu. Sau khi đăng nhập, quyền của bạn phụ thuộc vào việc quản trị viên đã thêm tài khoản bạn vào danh sách "editors" trên Firebase Console hay chưa, với giá trị "admin" (toàn quyền sửa danh sách chính, duyệt nháp của người khác) hoặc "member" (chỉ sửa được "Nháp của tôi" riêng, chờ admin duyệt). Quản trị viên có thể thu hồi quyền của bất kỳ ai bất cứ lúc nào từ Console, không cần đổi mật khẩu hay gửi lại file.
     </div>
   </div>
 </div>
@@ -363,6 +371,17 @@ body.locked #mainApp{display:none;}
     <div class="form-actions">
       <button class="btn secondary" id="closeExportBtn">Đóng</button>
       <button class="btn" id="copyExportBtn">Sao chép</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="pendingOverlay">
+  <div class="form-card" style="max-width:900px;max-height:82vh;overflow:auto;">
+    <h3>📥 Nháp đang chờ duyệt</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:-8px;">Xem qua từng nháp của người nhập liệu. Duyệt để gộp vào danh sách chính, hoặc từ chối để xoá nháp đó (họ sẽ phải nhập lại).</p>
+    <div id="pendingBody">Đang tải...</div>
+    <div class="form-actions">
+      <button class="btn secondary" id="closePendingBtn">Đóng</button>
     </div>
   </div>
 </div>
@@ -411,6 +430,57 @@ let cloudListener = null;
 let applyingCloud = false;
 let cloudConfigured = false;
 
+// ---- Vai trò & chế độ dữ liệu (admin toàn quyền / member chỉ nộp nháp) ----
+let myUid = null;
+let myRole = null; // 'admin' | 'member' | null (chưa xác định / chưa đăng nhập)
+let dataMode = 'main'; // 'main' (danh sách chính) | 'draft' (nháp của tôi)
+
+function canEditCurrentMode(){
+  if(dataMode === 'draft') return true; // nháp của mình luôn sửa được
+  return myRole === 'admin'; // danh sách chính: chỉ admin sửa trực tiếp
+}
+
+function mainRef(){ return firebase.database().ref('sharedData/members'); }
+function draftRef(uid){ return firebase.database().ref('sharedData/drafts/' + uid); }
+
+function updateModeUI(){
+  const switchEl = document.getElementById('modeSwitch');
+  const banner = document.getElementById('modeBanner');
+  const reviewBtn = document.getElementById('modeReviewBtn');
+  const mainBtn = document.getElementById('modeMainBtn');
+  const draftBtn = document.getElementById('modeDraftBtn');
+  if(!switchEl) return;
+  if(!myRole){ switchEl.style.display = 'none'; return; }
+  switchEl.style.display = 'flex';
+  reviewBtn.style.display = (myRole==='admin') ? 'inline-block' : 'none';
+  mainBtn.classList.toggle('active', dataMode==='main');
+  draftBtn.classList.toggle('active', dataMode==='draft');
+  const addBtn = document.getElementById('addBtn');
+  if(dataMode==='main'){
+    banner.textContent = myRole==='admin'
+      ? '📋 Danh sách chính — bạn là quản trị, sửa trực tiếp vào đây.'
+      : '📋 Danh sách chính — chỉ xem. Muốn thêm/sửa, chuyển sang "📝 Nháp của tôi".';
+    if(addBtn) addBtn.style.display = (myRole==='admin') ? '' : 'none';
+  }else{
+    banner.textContent = '📝 Nháp của tôi — chỉ mình bạn thấy khu này. Thêm/sửa thoải mái, khi xong nhờ quản trị viên vào "Chờ duyệt" để gộp vào danh sách chính.';
+    if(addBtn) addBtn.style.display = '';
+  }
+}
+
+async function switchDataMode(mode){
+  if(!myRole) return;
+  if(mode === dataMode) return;
+  dataMode = mode;
+  selectedHousehold = null;
+  selectedTo = '__ALL__';
+  if(cloudListener && cloudRef) cloudRef.off('value', cloudListener);
+  members = [];
+  cloudRef = (mode === 'main') ? mainRef() : draftRef(myUid);
+  attachCloudListener();
+  updateModeUI();
+  render();
+}
+
 function firebaseIsConfigured(){
   return FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('DAN_DIEN_') &&
          FIREBASE_CONFIG.projectId && !FIREBASE_CONFIG.projectId.startsWith('DAN_DIEN_') &&
@@ -437,15 +507,34 @@ function initFirebase(){
       cloudReady = !!user;
       if(user){
         // QUAN TRỌNG: mọi tài khoản (chủ sổ và người được mời) đều trỏ vào
-        // CÙNG một nhánh dữ liệu chung 'sharedData/members'. Việc ai được
-        // đọc/ghi nhánh này do Security Rules trên Firebase Console quyết định,
-        // dựa vào danh sách 'sharedData/editors/{uid}'. Muốn thu hồi quyền của
-        // ai đó, chỉ cần xoá UID của họ khỏi danh sách editors trên Console —
-        // không cần sửa lại file này hay gửi lại file mới cho ai cả.
-        cloudRef = firebase.database().ref('sharedData/members');
+        // CÙNG một nhánh dữ liệu chung 'sharedData'. Vai trò của từng người
+        // (admin = toàn quyền sửa danh sách chính, member = chỉ nộp nháp riêng
+        // chờ duyệt) được xác định bằng GIÁ TRỊ của UID trong 'sharedData/editors'
+        // trên Firebase Console: giá trị "admin" hoặc "member" (không còn dùng
+        // true/false nữa). Muốn thu hồi quyền của ai đó, xoá UID của họ khỏi
+        // editors trên Console — không cần sửa lại file hay gửi lại file mới.
+        myUid = user.uid;
+        try{
+          const snap = await firebase.database().ref('sharedData/editors/' + myUid).once('value');
+          const val = snap.val();
+          myRole = (val === 'admin') ? 'admin' : (val ? 'member' : null);
+        }catch(e){
+          myRole = null;
+        }
+        dataMode = 'main';
+        cloudRef = mainRef();
         attachCloudListener();
-        setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ'), true);
+        updateModeUI();
+        if(!myRole){
+          setSyncStatus('⛔ Tài khoản này chưa được cấp quyền. Liên hệ quản trị viên để được thêm vào danh sách editors.', false);
+        }else{
+          setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ') + ' — vai trò: ' + (myRole==='admin' ? 'Quản trị' : 'Thành viên (nộp nháp)'), true);
+        }
       }else{
+        myUid = null;
+        myRole = null;
+        dataMode = 'main';
+        updateModeUI();
         cloudRef = null;
         cloudReady = false;
         setSyncStatus('Chưa đăng nhập tài khoản đồng bộ.');
@@ -461,13 +550,12 @@ function attachCloudListener(){
   if(!cloudRef) return;
   if(cloudListener) cloudRef.off('value', cloudListener);
   cloudListener = snap => {
-    if(!snap.exists()) return;
-    const cloudMembers = snap.val();
-    if(!Array.isArray(cloudMembers)) return;
+    const cloudMembers = snap.exists() ? snap.val() : [];
+    if(!Array.isArray(cloudMembers)){ return; }
     applyingCloud = true;
     members = ensureToField(cloudMembers);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-    if(members.length > 0) selectedHousehold='__ALL__';
+    if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+    if(members.length > 0) selectedHousehold='__ALL__'; else selectedHousehold=null;
     render();
     applyingCloud = false;
     setSyncStatus('☁️ Đã đồng bộ dữ liệu mới nhất', true);
@@ -587,7 +675,7 @@ async function loadData(){
 
 async function saveData(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+    if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
     await pushCloudData();
   }catch(e){
     console.error('Lỗi lưu dữ liệu', e);
@@ -783,10 +871,11 @@ function renderMain(){
   attachDeleteHandlers();
 }
 
-function memberTable(list, showMeta){
+function memberTable(list, showMeta, canEdit){
+  if(canEdit === undefined) canEdit = canEditCurrentMode();
   return `<div class="members"><table>
     <thead><tr>
-      <th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Địa chỉ</th>${showMeta?'<th>Tổ</th><th>Hộ</th>':''}<th></th>
+      <th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Địa chỉ</th>${showMeta?'<th>Tổ</th><th>Hộ</th>':''}${canEdit?'<th></th>':''}
     </tr></thead>
     <tbody>
       ${list.map(m=>`
@@ -796,10 +885,10 @@ function memberTable(list, showMeta){
           <td>${escapeHtml(m.year||'')}</td>
           <td>${escapeHtml(m.address||'')}</td>
           ${showMeta?`<td>${escapeHtml(m.to||'')}</td><td>${escapeHtml(m.household||'')}</td>`:''}
-          <td style="white-space:nowrap;">
+          ${canEdit?`<td style="white-space:nowrap;">
             <button class="edit-btn" data-id="${m.id}">Sửa</button>
             <button class="del-btn" data-id="${m.id}">Xóa</button>
-          </td>
+          </td>`:''}
         </tr>
       `).join('')}
     </tbody>
@@ -809,6 +898,7 @@ function memberTable(list, showMeta){
 function attachDeleteHandlers(){
   document.querySelectorAll('.del-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
+      if(!canEditCurrentMode()){ alert('Bạn không có quyền xoá ở danh sách chính.'); return; }
       const id = btn.getAttribute('data-id');
       members = members.filter(m=>String(m.id)!==id);
       await saveData();
@@ -863,7 +953,13 @@ function openMemberForm(existing){
   document.getElementById('fName').focus();
 }
 
-document.getElementById('addBtn').addEventListener('click', ()=> openMemberForm(null));
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  if(!canEditCurrentMode()){
+    alert('Bạn không có quyền sửa danh sách chính. Hãy chuyển sang "📝 Nháp của tôi" để thêm thành viên, quản trị viên sẽ duyệt sau.');
+    return;
+  }
+  openMemberForm(null);
+});
 document.getElementById('cancelBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 
 // Bấm Enter trong ô nhập -> nhảy sang ô kế tiếp; Enter ở ô cuối -> Lưu thành viên luôn
@@ -895,6 +991,10 @@ document.getElementById('fYear').addEventListener('input', (e)=>{
 });
 
 document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  if(!canEditCurrentMode()){
+    alert('Bạn không có quyền lưu vào danh sách chính.');
+    return;
+  }
   const name = document.getElementById('fName').value.trim();
   const cccd = document.getElementById('fCccd').value.trim();
   const year = document.getElementById('fYear').value.trim();
@@ -1189,7 +1289,87 @@ document.getElementById('doImportBtn').addEventListener('click', async ()=>{
   }
 });
 
+// ---- Chờ duyệt (chỉ admin) — xem & gộp/từ chối nháp của từng người ----
+async function openReviewPanel(){
+  if(myRole !== 'admin'){ alert('Chỉ quản trị viên mới xem được mục này.'); return; }
+  document.getElementById('pendingOverlay').classList.add('show');
+  const body = document.getElementById('pendingBody');
+  body.innerHTML = 'Đang tải...';
+  try{
+    const snap = await firebase.database().ref('sharedData/drafts').once('value');
+    const all = snap.exists() ? snap.val() : {};
+    const uids = Object.keys(all).filter(uid => Array.isArray(all[uid]) && all[uid].length > 0);
+    if(uids.length === 0){
+      body.innerHTML = '<div class="empty-note">Không có nháp nào đang chờ duyệt.</div>';
+      return;
+    }
+    body.innerHTML = uids.map(uid=>{
+      const list = ensureToField(all[uid]);
+      const groups = groupByHousehold(list);
+      const householdCount = Object.keys(groups).length;
+      const shortUid = uid.slice(0,10) + '…';
+      return `
+      <div style="border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div><b>Người nộp (UID):</b> ${escapeHtml(shortUid)} &nbsp; — ${list.length} người trong ${householdCount} hộ</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn secondary reject-draft-btn" data-uid="${escapeAttr(uid)}">❌ Từ chối</button>
+            <button class="btn approve-draft-btn" data-uid="${escapeAttr(uid)}">✅ Duyệt, gộp vào chính</button>
+          </div>
+        </div>
+        ${memberTable(list, true, false)}
+      </div>`;
+    }).join('');
+    body.querySelectorAll('.approve-draft-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> approveDraft(btn.getAttribute('data-uid')));
+    });
+    body.querySelectorAll('.reject-draft-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> rejectDraft(btn.getAttribute('data-uid')));
+    });
+  }catch(err){
+    console.error(err);
+    body.innerHTML = '<div class="empty-note">Không tải được danh sách chờ duyệt: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+async function approveDraft(uid){
+  try{
+    const draftSnap = await firebase.database().ref('sharedData/drafts/' + uid).once('value');
+    const draftList = draftSnap.exists() ? draftSnap.val() : [];
+    if(!Array.isArray(draftList) || draftList.length === 0){ alert('Nháp này trống, không có gì để duyệt.'); return; }
+    if(!confirm(`Duyệt ${draftList.length} người vào danh sách chính?`)) return;
+    const mainSnap = await firebase.database().ref('sharedData/members').once('value');
+    const mainList = mainSnap.exists() ? mainSnap.val() : [];
+    const merged = ensureToField(mainList.concat(draftList));
+    await firebase.database().ref('sharedData/members').set(merged);
+    await firebase.database().ref('sharedData/drafts/' + uid).remove();
+    alert('Đã gộp vào danh sách chính. Nháp của người đó đã được xoá.');
+    openReviewPanel();
+  }catch(err){
+    console.error(err);
+    alert('Lỗi khi duyệt: ' + err.message);
+  }
+}
+
+async function rejectDraft(uid){
+  if(!confirm('Xoá nháp này? Người nộp sẽ phải nhập lại từ đầu nếu muốn nộp lại.')) return;
+  try{
+    await firebase.database().ref('sharedData/drafts/' + uid).remove();
+    openReviewPanel();
+  }catch(err){
+    console.error(err);
+    alert('Lỗi khi từ chối: ' + err.message);
+  }
+}
+
+document.getElementById('closePendingBtn').addEventListener('click', ()=>{
+  document.getElementById('pendingOverlay').classList.remove('show');
+});
+
 document.getElementById('syncBtn').addEventListener('click', openSync);
+document.getElementById('modeMainBtn').addEventListener('click', ()=> switchDataMode('main'));
+document.getElementById('modeDraftBtn').addEventListener('click', ()=> switchDataMode('draft'));
+document.getElementById('modeReviewBtn').addEventListener('click', openReviewPanel);
 document.getElementById('closeSyncBtn').addEventListener('click', closeSync);
 document.getElementById('syncLoginBtn').addEventListener('click', loginCloud);
 document.getElementById('syncSignUpBtn').addEventListener('click', signUpCloud);
