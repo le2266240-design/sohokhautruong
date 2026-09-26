@@ -7,16 +7,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root{
-  --paper:#F6F1E7;
-  --paper-2:#EFE7D6;
-  --ink:#2B2420;
-  --ink-soft:#6B6055;
+  --paper:#F7F2E9;
+  --paper-2:#EEE4D0;
+  --ink:#2A231D;
+  --ink-soft:#6B5F51;
   --maroon:#7A2E2E;
-  --maroon-dark:#5E2222;
-  --green:#3F5443;
-  --line:#D9CFC0;
-  --gold:#B08D57;
-  --white:#FFFDF8;
+  --maroon-dark:#4A1B1B;
+  --green:#3B5142;
+  --line:#E0D3B8;
+  --gold:#9C7A35;
+  --white:#FFFCF6;
 }
 *{box-sizing:border-box;}
 body{
@@ -42,15 +42,23 @@ body{
 .masthead h1{
   font-family:'Source Serif 4',serif;
   font-weight:700;
-  font-size:30px;
+  font-size:31px;
   margin:0;
   color:var(--maroon-dark);
   letter-spacing:0.2px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+.masthead h1::before{
+  content:"";
+  display:inline-block;width:11px;height:11px;border-radius:50%;
+  background:var(--maroon);flex-shrink:0;
 }
 .masthead p{
-  margin:4px 0 0;
+  margin:5px 0 0;
   color:var(--ink-soft);
-  font-size:14px;
+  font-size:13.5px;
 }
 .search-box{
   display:flex;
@@ -82,6 +90,7 @@ body{
   background:var(--white);
   border:1px solid var(--line);
   border-radius:10px;
+  box-shadow:0 1px 3px rgba(74,27,27,0.05);
 }
 .panel-title{
   font-family:'Source Serif 4',serif;
@@ -116,7 +125,7 @@ body{
 .empty-note{padding:18px 16px;color:var(--ink-soft);font-size:13.5px;line-height:1.6;}
 
 /* main area */
-.main-panel{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.main-panel{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(74,27,27,0.05);}
 .main-header{
   display:flex;justify-content:space-between;align-items:center;
   padding:16px 20px;border-bottom:1px solid var(--line);
@@ -134,10 +143,51 @@ body{
 .btn.secondary{background:transparent;color:var(--maroon);border:1px solid var(--maroon);}
 .btn.secondary:hover{background:#faf1ef;}
 #modeSwitch .btn.secondary.active{background:var(--maroon);color:#fff;}
+.tab-btn{
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  padding:9px 4px;font-family:'Inter';font-size:13px;color:var(--ink-soft);
+  cursor:pointer;font-weight:600;
+}
+.tab-btn:hover{color:var(--maroon);}
+.tab-btn.active{color:var(--maroon-dark);border-bottom-color:var(--maroon);}
+.tools-menu{position:relative;}
+.tools-menu summary{list-style:none;cursor:pointer;}
+.tools-menu summary::-webkit-details-marker{display:none;}
+.tools-menu[open] summary{background:#faf1ef;}
+.tools-menu-list{
+  position:absolute;top:calc(100% + 6px);right:0;background:var(--white);
+  border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(43,36,32,0.14);
+  padding:6px;min-width:200px;z-index:30;display:flex;flex-direction:column;gap:2px;
+}
+.tools-menu-item{
+  display:block;width:100%;text-align:left;background:none;border:none;border-radius:6px;
+  padding:9px 10px;font-family:'Inter';font-size:13.5px;color:var(--ink);cursor:pointer;
+}
+.tools-menu-item:hover{background:var(--paper-2);}
 
 /* member table */
-.members{padding:6px 0;overflow-x:auto;}
-.members table{min-width:600px;}
+.members{padding:2px 0;}
+.record-row{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding:14px 4px;border-bottom:1px solid var(--line);
+}
+.record-row:last-child{border-bottom:none;}
+.record-main{min-width:0;flex:1;}
+.record-line1{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.record-name{font-family:'Source Serif 4',serif;font-weight:600;font-size:16px;color:var(--ink);}
+.record-cccd{font-size:13px;color:var(--maroon-dark);font-variant-numeric:tabular-nums;letter-spacing:0.02em;}
+.record-line2{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+.record-line2 span:not(:last-child)::after{content:" · ";color:var(--line);}
+.record-address{font-size:12.5px;color:var(--ink-soft);margin-top:3px;}
+.record-note{font-size:12.5px;color:var(--maroon);font-style:italic;margin-top:3px;}
+.record-tag{display:inline-block;font-size:11px;color:var(--ink-soft);background:var(--paper-2);border-radius:5px;padding:2px 7px;margin-top:6px;}
+.record-actions{display:flex;gap:6px;flex-shrink:0;white-space:nowrap;padding-top:2px;}
+.record-actions button{
+  background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;
+  font-size:12.5px;color:var(--ink-soft);cursor:pointer;font-family:'Inter';
+}
+.record-actions .edit-btn:hover{border-color:var(--maroon);color:var(--maroon);}
+.record-actions .del-btn:hover{border-color:#a33;color:#a33;}
 table{width:100%;border-collapse:collapse;font-size:14px;}
 th{
   text-align:left;padding:10px 20px;font-weight:600;color:var(--ink-soft);
@@ -168,16 +218,22 @@ td.cccd{font-variant-numeric:tabular-nums;color:var(--ink-soft);}
   background:var(--white);border-radius:12px;padding:26px;width:100%;max-width:420px;
   border:1px solid var(--line);
 }
+.form-card.form-card-wide{max-width:560px;}
 .form-card h3{
   font-family:'Source Serif 4',serif;margin:0 0 18px;font-size:19px;color:var(--maroon-dark);
 }
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;}
+.field-grid .field{margin-bottom:0;}
+.field-grid .span-2{grid-column:1 / -1;}
+@media (max-width:560px){ .field-grid{grid-template-columns:1fr;} }
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:5px;}
-.field input{
+.field input, .field textarea{
   width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;
   font-family:'Inter';font-size:14px;color:var(--ink);background:var(--paper);
 }
-.field input:focus{outline:2px solid var(--gold);outline-offset:0;}
+.field textarea{resize:vertical;min-height:44px;font-family:'Inter';}
+.field input:focus, .field textarea:focus{outline:2px solid var(--gold);outline-offset:0;}
 .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
 .search-results{padding:0;}
 .result-group{padding:10px 20px;font-size:12px;font-weight:600;color:var(--ink-soft);background:var(--paper-2);text-transform:uppercase;letter-spacing:0.03em;}
@@ -278,11 +334,11 @@ body.locked #mainApp{display:none;}
     <div>
       <h1>Sổ Hộ Khẩu Điện Tử</h1>
       <p>Quản lý thành viên theo hộ — dữ liệu chỉ hiện sau khi đăng nhập & được cấp quyền qua cloud (bấm "☁️ Đồng bộ").</p>
-      <div id="roleBanner" style="display:none;margin-top:8px;padding:7px 12px;background:#FFF3D6;border:1px solid var(--gold);border-radius:8px;font-size:12px;color:var(--maroon-dark);font-weight:600;"></div>
     </div>
     <div class="search-box">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="searchInput" type="text" placeholder="Tìm tên, số căn cước, địa chỉ...">
+      <input id="searchYearInput" type="text" inputmode="numeric" maxlength="4" placeholder="Đúng năm sinh (vd: 1991)" style="width:150px;">
     </div>
   </div>
 
@@ -305,36 +361,48 @@ body.locked #mainApp{display:none;}
           <h2 id="mainTitle">Chọn một hộ để xem</h2>
           <div class="sub" id="mainSub">hoặc tìm kiếm ở góc trên</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn secondary" id="printBtn">In tất cả</button>
-          <button class="btn secondary" id="viewOnlyBtn">📄 Tạo bản chỉ xem</button>
-          <button class="btn secondary" id="exportBtn">💾 Lưu vào máy</button>
-          <button class="btn secondary" id="restoreFileBtn">📂 Khôi phục</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn secondary" id="syncBtn">☁️ Đồng bộ</button>
-          <button class="btn secondary" id="importBtn">Nhập dữ liệu</button>
+          <details class="tools-menu">
+            <summary class="btn secondary">⚙ Công cụ</summary>
+            <div class="tools-menu-list">
+              <button class="tools-menu-item" id="printBtn">🖨 In tất cả</button>
+              <button class="tools-menu-item" id="viewOnlyBtn">📄 Tạo bản chỉ xem</button>
+              <button class="tools-menu-item" id="exportBtn">💾 Lưu vào máy</button>
+              <button class="tools-menu-item" id="restoreFileBtn">📂 Khôi phục</button>
+              <button class="tools-menu-item" id="importBtn">📥 Nhập dữ liệu</button>
+            </div>
+          </details>
           <button class="btn" id="addBtn">+ Thêm thành viên</button>
         </div>
       </div>
-      <div id="modeSwitch" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--paper-2);border-bottom:1px solid var(--line);font-size:12.5px;">
-        <button class="btn secondary" id="modeMainBtn" style="padding:6px 12px;font-size:12.5px;">📋 Danh sách chính</button>
-        <button class="btn secondary" id="modeDraftBtn" style="padding:6px 12px;font-size:12.5px;">📝 Nháp của tôi</button>
-        <button class="btn secondary" id="modeReviewBtn" style="padding:6px 12px;font-size:12.5px;display:none;">🗂 Chờ duyệt</button>
-        <span id="modeBanner" style="color:var(--ink-soft);margin-left:6px;"></span>
+      <div id="modeSwitch" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;padding:0 20px 16px;font-size:12.5px;">
+        <button class="tab-btn" id="modeMainBtn">📋 Danh sách chính</button>
+        <button class="tab-btn" id="modeDraftBtn">📝 Nháp của tôi</button>
+        <button class="tab-btn" id="modeReviewBtn" style="display:none;">🗂 Chờ duyệt<span id="pendingBadge" style="display:none;background:#c0392b;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:6px;font-weight:700;">0</span></button>
+        <button class="btn" id="submitDraftBtn" style="display:none;padding:6px 14px;font-size:12.5px;margin-left:8px;">✅ Gửi duyệt</button>
+        <span id="modeBanner" style="color:var(--ink-soft);margin-left:8px;"></span>
       </div>
       <div id="mainContent"></div>
     </div>
   </div>
 </div>
+</div>
 
 <div class="overlay" id="overlay">
-  <div class="form-card">
+  <div class="form-card form-card-wide">
     <h3 id="formTitle">Thêm thành viên mới</h3>
-    <div class="field"><label>Họ và tên</label><input id="fName" type="text" placeholder="Nguyễn Văn A"></div>
-    <div class="field"><label>Số căn cước / CCCD</label><input id="fCccd" type="text" placeholder="0908501797"></div>
-    <div class="field"><label>Ngày sinh</label><input id="fYear" type="text" inputmode="numeric" placeholder="18/12/2004" maxlength="10"></div>
-    <div class="field"><label>Địa chỉ</label><input id="fAddr" type="text" placeholder="123 Đường ABC, Quận 1, TP.HCM"></div>
-    <div class="field"><label>Tổ</label><input id="fTo" type="text" placeholder="14"></div>
-    <div class="field"><label>Số hộ</label><input id="fHousehold" type="text" placeholder="1"></div>
+    <div class="field-grid">
+      <div class="field span-2"><label>Họ và tên</label><input id="fName" type="text" placeholder="Nguyễn Văn A"></div>
+      <div class="field"><label>Số căn cước / CCCD</label><input id="fCccd" type="text" placeholder="0908501797"></div>
+      <div class="field"><label>Ngày sinh</label><input id="fYear" type="text" inputmode="numeric" placeholder="18/12/2004" maxlength="10"></div>
+      <div class="field"><label>Dân tộc</label><input id="fEthnicity" type="text" placeholder="Kinh"></div>
+      <div class="field"><label>Tôn giáo</label><input id="fReligion" type="text" placeholder="Không"></div>
+      <div class="field span-2"><label>Địa chỉ</label><input id="fAddr" type="text" placeholder="123 Đường ABC, Quận 1, TP.HCM"></div>
+      <div class="field"><label>Tổ</label><input id="fTo" type="text" placeholder="14"></div>
+      <div class="field"><label>Số hộ</label><input id="fHousehold" type="text" placeholder="1"></div>
+      <div class="field span-2"><label>Ghi chú</label><textarea id="fNote" rows="2" placeholder="Tạm vắng, chuyển đi, bổ sung sau..."></textarea></div>
+    </div>
     <div class="form-actions">
       <button class="btn secondary" id="cancelBtn">Hủy</button>
       <button class="btn" id="saveBtn">Lưu thành viên</button>
@@ -440,6 +508,43 @@ function canEditCurrentMode(){
   return myRole === 'admin'; // danh sách chính: chỉ admin sửa trực tiếp
 }
 
+function statusRef(uid){ return firebase.database().ref('sharedData/draftStatus/' + uid); }
+let draftStatusListener = null;
+let draftStatusVal = null;
+
+function attachDraftStatusListener(){
+  if(!myUid) return;
+  if(draftStatusListener) statusRef(myUid).off('value', draftStatusListener);
+  draftStatusListener = snap => {
+    draftStatusVal = snap.exists() ? snap.val() : null;
+    updateModeUI();
+  };
+  statusRef(myUid).on('value', draftStatusListener);
+}
+
+async function submitDraftForReview(){
+  if(dataMode !== 'draft'){ return; }
+  if(!members || members.length === 0){
+    alert('Nháp của bạn đang trống — thêm ít nhất 1 người trước khi gửi duyệt.');
+    return;
+  }
+  try{
+    await statusRef(myUid).set({ submitted: true, submittedAt: Date.now(), count: members.length });
+    alert('✅ Đã gửi yêu cầu duyệt! Quản trị viên sẽ xem và gộp vào danh sách chính khi duyệt xong.');
+  }catch(err){
+    console.error(err);
+    alert('Lỗi khi gửi duyệt: ' + err.message);
+  }
+}
+
+// Mỗi khi member sửa nháp sau khi đã gửi duyệt, tự đánh dấu "chưa gửi lại"
+// để admin không lỡ duyệt bản cũ đã thay đổi.
+async function markDraftChangedIfNeeded(){
+  if(dataMode === 'draft' && myUid && draftStatusVal && draftStatusVal.submitted){
+    try{ await statusRef(myUid).update({ submitted: false }); }catch(e){ console.error(e); }
+  }
+}
+
 function mainRef(){ return firebase.database().ref('sharedData/members'); }
 function draftRef(uid){ return firebase.database().ref('sharedData/drafts/' + uid); }
 
@@ -449,6 +554,7 @@ function updateModeUI(){
   const reviewBtn = document.getElementById('modeReviewBtn');
   const mainBtn = document.getElementById('modeMainBtn');
   const draftBtn = document.getElementById('modeDraftBtn');
+  const submitBtn = document.getElementById('submitDraftBtn');
   if(!switchEl) return;
   if(!myRole){ switchEl.style.display = 'none'; return; }
   switchEl.style.display = 'flex';
@@ -457,13 +563,20 @@ function updateModeUI(){
   draftBtn.classList.toggle('active', dataMode==='draft');
   const addBtn = document.getElementById('addBtn');
   if(dataMode==='main'){
-    banner.textContent = myRole==='admin'
+    banner.innerHTML = myRole==='admin'
       ? '📋 Danh sách chính — bạn là quản trị, sửa trực tiếp vào đây.'
       : '📋 Danh sách chính — chỉ xem. Muốn thêm/sửa, chuyển sang "📝 Nháp của tôi".';
     if(addBtn) addBtn.style.display = (myRole==='admin') ? '' : 'none';
+    submitBtn.style.display = 'none';
   }else{
-    banner.textContent = '📝 Nháp của tôi — chỉ mình bạn thấy khu này. Thêm/sửa thoải mái, khi xong nhờ quản trị viên vào "Chờ duyệt" để gộp vào danh sách chính.';
     if(addBtn) addBtn.style.display = '';
+    submitBtn.style.display = 'inline-block';
+    if(draftStatusVal && draftStatusVal.submitted){
+      const t = new Date(draftStatusVal.submittedAt).toLocaleString('vi-VN');
+      banner.innerHTML = `📝 Nháp của tôi — <b style="color:var(--green);">✅ Đã gửi duyệt lúc ${t}</b> (${draftStatusVal.count} người). Đang chờ quản trị viên duyệt.`;
+    }else{
+      banner.innerHTML = '📝 Nháp của tôi — chỉ mình bạn thấy khu này. Thêm/sửa xong nhớ bấm "📤 Gửi duyệt" để báo quản trị viên.';
+    }
   }
 }
 
@@ -524,6 +637,9 @@ function initFirebase(){
         dataMode = 'main';
         cloudRef = mainRef();
         attachCloudListener();
+        attachNotificationListener(myUid);
+        attachDraftStatusListener();
+        if(myRole === 'admin') attachPendingBadgeListener(); else detachPendingBadgeListener();
         updateModeUI();
         if(!myRole){
           setSyncStatus('⛔ Tài khoản này chưa được cấp quyền. Liên hệ quản trị viên để được thêm vào danh sách editors.', false);
@@ -531,10 +647,14 @@ function initFirebase(){
           setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ') + ' — vai trò: ' + (myRole==='admin' ? 'Quản trị' : 'Thành viên (nộp nháp)'), true);
         }
       }else{
+        if(myUid && draftStatusListener){ statusRef(myUid).off('value', draftStatusListener); }
         myUid = null;
         myRole = null;
         dataMode = 'main';
+        draftStatusVal = null;
+        draftStatusListener = null;
         updateModeUI();
+        detachPendingBadgeListener();
         cloudRef = null;
         cloudReady = false;
         setSyncStatus('Chưa đăng nhập tài khoản đồng bộ.');
@@ -649,9 +769,13 @@ function closeSync(){ document.getElementById('syncOverlay').classList.remove('s
 
 // Toàn bộ dữ liệu đã nhập trước đây đều thuộc Tổ 14 — gán mặc định "to":"14"
 // cho những bản ghi chưa có Tổ, để phân biệt với các Tổ khác sẽ thêm sau này.
+// Đồng thời đảm bảo các bản ghi cũ (chưa có Dân tộc/Tôn giáo/Ghi chú) không bị lỗi.
 function ensureToField(list){
   list.forEach(m=>{
     if(!m.to || String(m.to).trim()===''){ m.to = '14'; }
+    if(m.ethnicity === undefined) m.ethnicity = '';
+    if(m.religion === undefined) m.religion = '';
+    if(m.note === undefined) m.note = '';
   });
   return list;
 }
@@ -677,6 +801,7 @@ async function saveData(){
   try{
     if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
     await pushCloudData();
+    await markDraftChangedIfNeeded();
   }catch(e){
     console.error('Lỗi lưu dữ liệu', e);
     alert('Không lưu được dữ liệu. Trình duyệt có thể đang chặn bộ nhớ cục bộ (chế độ ẩn danh?).');
@@ -766,6 +891,7 @@ function renderHouseholdList(){
     el.addEventListener('click', ()=>{
       selectedHousehold = el.getAttribute('data-key');
       document.getElementById('searchInput').value='';
+      document.getElementById('searchYearInput').value='';
       render();
     });
   });
@@ -775,58 +901,76 @@ document.getElementById('toSelect').addEventListener('change', (e)=>{
   selectedTo = e.target.value;
   selectedHousehold = '__ALL__';
   document.getElementById('searchInput').value='';
+  document.getElementById('searchYearInput').value='';
   render();
 });
+
+function birthYearOf(m){
+  const s = String(m.year||'').trim();
+  const match = s.match(/(\d{4})\s*$/); // lấy đúng 4 số cuối cùng (năm), bỏ qua ngày/tháng
+  return match ? match[1] : '';
+}
 
 function renderMain(){
   const title = document.getElementById('mainTitle');
   const sub = document.getElementById('mainSub');
   const content = document.getElementById('mainContent');
   const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const yearQuery = document.getElementById('searchYearInput').value.trim();
 
-  if(query){
-    const filtered = members.filter(m =>
-      (m.name||'').toLowerCase().includes(query) ||
-      (m.cccd||'').toLowerCase().includes(query) ||
-      (m.address||'').toLowerCase().includes(query) ||
-      (m.household||'').toLowerCase().includes(query) ||
-      (m.to||'').toLowerCase().includes(query) ||
-      (m.year||'').toLowerCase().includes(query)
-    );
+  if(query || yearQuery){
+    let filtered = members;
+    if(query){
+      filtered = filtered.filter(m =>
+        (m.name||'').toLowerCase().includes(query) ||
+        (m.cccd||'').toLowerCase().includes(query) ||
+        (m.address||'').toLowerCase().includes(query) ||
+        (m.household||'').toLowerCase().includes(query) ||
+        (m.to||'').toLowerCase().includes(query) ||
+        (m.year||'').toLowerCase().includes(query)
+      );
+    }
+    if(yearQuery){
+      // Chỉ khớp ĐÚNG năm sinh (4 số cuối của ngày sinh), không dò trong CCCD/địa chỉ
+      filtered = filtered.filter(m => birthYearOf(m) === yearQuery);
+    }
     const groups = groupByHousehold(filtered);
     const keys = sortedGroupKeys(groups);
-    title.textContent = `Kết quả tìm kiếm: "${document.getElementById('searchInput').value.trim()}"`;
-    sub.textContent = `${filtered.length} người khớp trong ${keys.length} hộ — bấm vào một hộ để xem đầy đủ`;
-    if(keys.length===0){
+    const labelParts = [];
+    if(query) labelParts.push(`"${document.getElementById('searchInput').value.trim()}"`);
+    if(yearQuery) labelParts.push(`năm sinh ${yearQuery}`);
+    title.textContent = `Kết quả tìm kiếm: ${labelParts.join(' + ')}`;
+    sub.textContent = `${filtered.length} người khớp trong ${keys.length} hộ`;
+    if(filtered.length===0){
       content.innerHTML = `<div class="no-select-msg"><strong>Không tìm thấy</strong>Thử từ khóa khác.</div>`;
       return;
     }
-    content.innerHTML = `<div class="search-results">` + keys.map(k=>{
+    // Hiện đầy đủ thông tin (họ tên, CCCD, ngày sinh, địa chỉ) của TỪNG người
+    // khớp, gom theo từng hộ, kèm nút "Xem cả hộ" để xem luôn cả những người
+    // khác trong hộ đó (kể cả người không khớp từ khoá tìm kiếm).
+    const canEdit = canEditCurrentMode();
+    content.innerHTML = keys.map(k=>{
       const g = groups[k];
       const fullCount = members.filter(m =>
         (m.to||'(chưa có tổ)') === g.to && (m.household||'(chưa có số hộ)') === g.household
       ).length;
-      const matchNames = g.members.map(m=>`<b>${escapeHtml(m.name||'(chưa có tên)')}</b>`).join(', ');
+      const heading = `Tổ ${escapeHtml(g.to)} &mdash; Hộ ${escapeHtml(g.household)}`;
       return `
-      <div class="search-result-item" data-key="${escapeAttr(k)}">
-        <div>
-          <div class="sri-title">Tổ ${escapeHtml(g.to)} — Hộ ${escapeHtml(g.household)}</div>
-          <div class="sri-match">Khớp: ${matchNames}</div>
+      <div style="margin-bottom:26px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <h3 style="margin:0;font-family:'Source Serif 4',serif;color:var(--maroon-dark);">${heading} <span style="font-weight:400;font-size:13px;color:var(--ink-soft);">(khớp ${g.members.length}/${fullCount} người)</span></h3>
+          <button class="btn secondary view-household-btn" data-key="${escapeAttr(k)}">Xem cả hộ (${fullCount} người)</button>
         </div>
-        <div class="sri-side">
-          <span class="hcount">${fullCount} người trong hộ</span>
-          <button class="btn secondary">Xem cả hộ</button>
-        </div>
+        ${memberTable(g.members, false, canEdit)}
       </div>`;
-    }).join('') + `</div>`;
-    document.querySelectorAll('.search-result-item').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const key = el.getAttribute('data-key');
-        const g = groups[key];
-        if(!g) return;
-        selectedTo = g.to;
-        selectedHousehold = key;
+    }).join('');
+    attachDeleteHandlers();
+    content.querySelectorAll('.view-household-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        selectedTo = '__ALL__';
+        selectedHousehold = btn.getAttribute('data-key');
         document.getElementById('searchInput').value = '';
+        document.getElementById('searchYearInput').value = '';
         render();
       });
     });
@@ -873,26 +1017,32 @@ function renderMain(){
 
 function memberTable(list, showMeta, canEdit){
   if(canEdit === undefined) canEdit = canEditCurrentMode();
-  return `<div class="members"><table>
-    <thead><tr>
-      <th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Địa chỉ</th>${showMeta?'<th>Tổ</th><th>Hộ</th>':''}${canEdit?'<th></th>':''}
-    </tr></thead>
-    <tbody>
-      ${list.map(m=>`
-        <tr>
-          <td class="name">${escapeHtml(m.name||'')}</td>
-          <td class="cccd">${escapeHtml(m.cccd||'')}</td>
-          <td>${escapeHtml(m.year||'')}</td>
-          <td>${escapeHtml(m.address||'')}</td>
-          ${showMeta?`<td>${escapeHtml(m.to||'')}</td><td>${escapeHtml(m.household||'')}</td>`:''}
-          ${canEdit?`<td style="white-space:nowrap;">
-            <button class="edit-btn" data-id="${m.id}">Sửa</button>
-            <button class="del-btn" data-id="${m.id}">Xóa</button>
-          </td>`:''}
-        </tr>
-      `).join('')}
-    </tbody>
-  </table></div>`;
+  if(list.length === 0){
+    return `<div class="members"><div class="empty-note">Chưa có ai ở đây.</div></div>`;
+  }
+  return `<div class="members">${list.map(m=>{
+    const line2Parts = [];
+    if(m.year) line2Parts.push(`Sinh ${escapeHtml(m.year)}`);
+    if(m.ethnicity) line2Parts.push(`Dân tộc ${escapeHtml(m.ethnicity)}`);
+    if(m.religion) line2Parts.push(`Tôn giáo ${escapeHtml(m.religion)}`);
+    return `
+    <div class="record-row">
+      <div class="record-main">
+        <div class="record-line1">
+          <span class="record-name">${escapeHtml(m.name||'(chưa có tên)')}</span>
+          ${m.cccd ? `<span class="record-cccd">${escapeHtml(m.cccd)}</span>` : ''}
+        </div>
+        ${line2Parts.length ? `<div class="record-line2">${line2Parts.map(p=>`<span>${p}</span>`).join('')}</div>` : ''}
+        ${m.address ? `<div class="record-address">📍 ${escapeHtml(m.address)}</div>` : ''}
+        ${m.note ? `<div class="record-note">📝 ${escapeHtml(m.note)}</div>` : ''}
+        ${showMeta ? `<div class="record-tag">Tổ ${escapeHtml(m.to||'')} — Hộ ${escapeHtml(m.household||'')}</div>` : ''}
+      </div>
+      ${canEdit ? `<div class="record-actions">
+        <button class="edit-btn" data-id="${m.id}">Sửa</button>
+        <button class="del-btn" data-id="${m.id}">Xóa</button>
+      </div>` : ''}
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function attachDeleteHandlers(){
@@ -937,7 +1087,10 @@ function openMemberForm(existing){
   document.getElementById('fName').value = existing ? (existing.name||'') : '';
   document.getElementById('fCccd').value = existing ? (existing.cccd||'') : '';
   document.getElementById('fYear').value = existing ? (existing.year||'') : '';
+  document.getElementById('fEthnicity').value = existing ? (existing.ethnicity||'') : '';
+  document.getElementById('fReligion').value = existing ? (existing.religion||'') : '';
   document.getElementById('fAddr').value = existing ? (existing.address||'') : '';
+  document.getElementById('fNote').value = existing ? (existing.note||'') : '';
   let defaultHousehold = '';
   if(!existing && selectedHousehold && selectedHousehold !== '__ALL__' && selectedHousehold.indexOf('||') !== -1){
     defaultHousehold = selectedHousehold.split('||')[1];
@@ -963,7 +1116,8 @@ document.getElementById('addBtn').addEventListener('click', ()=>{
 document.getElementById('cancelBtn').addEventListener('click', ()=> overlay.classList.remove('show'));
 
 // Bấm Enter trong ô nhập -> nhảy sang ô kế tiếp; Enter ở ô cuối -> Lưu thành viên luôn
-const formFieldOrder = ['fName','fCccd','fYear','fAddr','fTo','fHousehold'];
+// (không áp dụng cho ô Ghi chú vì đó là textarea nhiều dòng, cần Enter để xuống dòng)
+const formFieldOrder = ['fName','fCccd','fYear','fEthnicity','fReligion','fAddr','fTo','fHousehold'];
 formFieldOrder.forEach((id, idx)=>{
   const el = document.getElementById(id);
   el.addEventListener('keydown', (e)=>{
@@ -998,17 +1152,20 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   const name = document.getElementById('fName').value.trim();
   const cccd = document.getElementById('fCccd').value.trim();
   const year = document.getElementById('fYear').value.trim();
+  const ethnicity = document.getElementById('fEthnicity').value.trim();
+  const religion = document.getElementById('fReligion').value.trim();
   const addr = document.getElementById('fAddr').value.trim();
   const to = document.getElementById('fTo').value.trim() || '14';
   const household = document.getElementById('fHousehold').value.trim();
+  const note = document.getElementById('fNote').value.trim();
   if(!name){ document.getElementById('fName').focus(); return; }
   if(editingId){
     const idx = members.findIndex(m=>String(m.id)===String(editingId));
     if(idx !== -1){
-      members[idx] = { ...members[idx], name, cccd, year, address: addr, to, household };
+      members[idx] = { ...members[idx], name, cccd, year, ethnicity, religion, address: addr, to, household, note };
     }
   }else{
-    members.push({ id: Date.now()+Math.random(), name, cccd, year, address: addr, to, household });
+    members.push({ id: Date.now()+Math.random(), name, cccd, year, ethnicity, religion, address: addr, to, household, note });
   }
   await saveData();
   selectedTo = to;
@@ -1019,6 +1176,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
 });
 
 document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('searchYearInput').addEventListener('input', render);
 
 // TẠO BẢN "CHỈ XEM" — một file HTML riêng, độc lập, không có bất kỳ nút
 // Thêm/Sửa/Xóa/Nhập/Khôi phục nào, chỉ để xem, tìm kiếm, lọc theo Tổ và in.
@@ -1111,9 +1269,9 @@ function buildViewOnlyHtml(){
   lines.push('    return 0;');
   lines.push('  });');
   lines.push('  document.getElementById("count").textContent = list.length + " nguoi";');
-  lines.push('  var html = "<table><thead><tr><th>To</th><th>Ho</th><th>Ho va ten</th><th>So CCCD</th><th>Ngay sinh</th><th>Dia chi</th></tr></thead><tbody>";');
+  lines.push('  var html = "<table><thead><tr><th>To</th><th>Ho</th><th>Ho va ten</th><th>So CCCD</th><th>Ngay sinh</th><th>Dan toc</th><th>Ton giao</th><th>Dia chi</th><th>Ghi chu</th></tr></thead><tbody>";');
   lines.push('  list.forEach(function(m){');
-  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.address) + "</td></tr>";');
+  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.ethnicity) + "</td><td>" + esc(m.religion) + "</td><td>" + esc(m.address) + "</td><td>" + esc(m.note) + "</td></tr>";');
   lines.push('  });');
   lines.push('  html += "</tbody></table>";');
   lines.push('  document.getElementById("tableArea").innerHTML = list.length ? html : "<p>Khong tim thay ket qua.</p>";');
@@ -1290,28 +1448,60 @@ document.getElementById('doImportBtn').addEventListener('click', async ()=>{
 });
 
 // ---- Chờ duyệt (chỉ admin) — xem & gộp/từ chối nháp của từng người ----
+// ---- Hộp thư cho admin: theo dõi số nháp đang chờ duyệt (huy hiệu đỏ) ----
+let pendingDraftsListenerRef = null;
+function attachPendingBadgeListener(){
+  if(pendingDraftsListenerRef) pendingDraftsListenerRef.off('value');
+  pendingDraftsListenerRef = firebase.database().ref('sharedData/draftStatus');
+  pendingDraftsListenerRef.on('value', snap => {
+    const badge = document.getElementById('pendingBadge');
+    if(!badge) return;
+    const all = snap.exists() ? snap.val() : {};
+    const count = Object.keys(all).filter(uid => all[uid] && all[uid].submitted).length;
+    if(count > 0){
+      badge.textContent = String(count);
+      badge.style.display = 'inline-block';
+    }else{
+      badge.style.display = 'none';
+    }
+  });
+}
+function detachPendingBadgeListener(){
+  if(pendingDraftsListenerRef){ pendingDraftsListenerRef.off('value'); pendingDraftsListenerRef = null; }
+  const badge = document.getElementById('pendingBadge');
+  if(badge) badge.style.display = 'none';
+}
+
 async function openReviewPanel(){
   if(myRole !== 'admin'){ alert('Chỉ quản trị viên mới xem được mục này.'); return; }
   document.getElementById('pendingOverlay').classList.add('show');
   const body = document.getElementById('pendingBody');
   body.innerHTML = 'Đang tải...';
   try{
-    const snap = await firebase.database().ref('sharedData/drafts').once('value');
-    const all = snap.exists() ? snap.val() : {};
-    const uids = Object.keys(all).filter(uid => Array.isArray(all[uid]) && all[uid].length > 0);
+    const statusSnap = await firebase.database().ref('sharedData/draftStatus').once('value');
+    const statusAll = statusSnap.exists() ? statusSnap.val() : {};
+    const submittedUids = Object.keys(statusAll).filter(uid => statusAll[uid] && statusAll[uid].submitted);
+    if(submittedUids.length === 0){
+      body.innerHTML = '<div class="empty-note">Không có nháp nào đang chờ duyệt. (Nháp người khác đang soạn dở, chưa bấm "Gửi duyệt", sẽ không hiện ở đây.)</div>';
+      return;
+    }
+    const draftsSnap = await firebase.database().ref('sharedData/drafts').once('value');
+    const allDrafts = draftsSnap.exists() ? draftsSnap.val() : {};
+    const uids = submittedUids.filter(uid => Array.isArray(allDrafts[uid]) && allDrafts[uid].length > 0);
     if(uids.length === 0){
       body.innerHTML = '<div class="empty-note">Không có nháp nào đang chờ duyệt.</div>';
       return;
     }
     body.innerHTML = uids.map(uid=>{
-      const list = ensureToField(all[uid]);
+      const list = ensureToField(allDrafts[uid]);
       const groups = groupByHousehold(list);
       const householdCount = Object.keys(groups).length;
       const shortUid = uid.slice(0,10) + '…';
+      const t = statusAll[uid].submittedAt ? new Date(statusAll[uid].submittedAt).toLocaleString('vi-VN') : '';
       return `
       <div style="border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-          <div><b>Người nộp (UID):</b> ${escapeHtml(shortUid)} &nbsp; — ${list.length} người trong ${householdCount} hộ</div>
+          <div><b>Người nộp (UID):</b> ${escapeHtml(shortUid)} &nbsp; — ${list.length} người trong ${householdCount} hộ ${t ? `&nbsp; · Gửi lúc ${t}` : ''}</div>
           <div style="display:flex;gap:8px;">
             <button class="btn secondary reject-draft-btn" data-uid="${escapeAttr(uid)}">❌ Từ chối</button>
             <button class="btn approve-draft-btn" data-uid="${escapeAttr(uid)}">✅ Duyệt, gộp vào chính</button>
@@ -1343,7 +1533,12 @@ async function approveDraft(uid){
     const merged = ensureToField(mainList.concat(draftList));
     await firebase.database().ref('sharedData/members').set(merged);
     await firebase.database().ref('sharedData/drafts/' + uid).remove();
-    alert('Đã gộp vào danh sách chính. Nháp của người đó đã được xoá.');
+    await firebase.database().ref('sharedData/draftStatus/' + uid).remove();
+    // Gửi thông báo cho người nộp — họ sẽ thấy ngay khi mở lại app
+    await firebase.database().ref('sharedData/notifications/' + uid).set({
+      type: 'approved', count: draftList.length, at: Date.now()
+    });
+    alert('Đã gộp vào danh sách chính. Nháp của người đó đã được xoá và họ sẽ nhận được thông báo.');
     openReviewPanel();
   }catch(err){
     console.error(err);
@@ -1355,11 +1550,31 @@ async function rejectDraft(uid){
   if(!confirm('Xoá nháp này? Người nộp sẽ phải nhập lại từ đầu nếu muốn nộp lại.')) return;
   try{
     await firebase.database().ref('sharedData/drafts/' + uid).remove();
+    await firebase.database().ref('sharedData/draftStatus/' + uid).remove();
+    // Gửi thông báo từ chối cho người nộp
+    await firebase.database().ref('sharedData/notifications/' + uid).set({
+      type: 'rejected', at: Date.now()
+    });
     openReviewPanel();
   }catch(err){
     console.error(err);
     alert('Lỗi khi từ chối: ' + err.message);
   }
+}
+
+// ---- Hiện thông báo cho người nộp nháp khi admin đã duyệt/từ chối ----
+function attachNotificationListener(uid){
+  firebase.database().ref('sharedData/notifications/' + uid).on('value', async snap => {
+    if(!snap.exists()) return;
+    const notif = snap.val();
+    if(notif && notif.type === 'approved'){
+      alert(`✅ Tin vui! Nháp bạn nộp (${notif.count} người) đã được quản trị viên DUYỆT và gộp vào danh sách chính rồi.`);
+    }else if(notif && notif.type === 'rejected'){
+      alert('❌ Nháp bạn nộp đã bị quản trị viên từ chối. Bạn có thể vào "Nháp của tôi" để nhập lại và nộp lại.');
+    }
+    // Xoá thông báo sau khi đã hiện, tránh hiện lại mỗi lần mở trang
+    try{ await firebase.database().ref('sharedData/notifications/' + uid).remove(); }catch(e){}
+  });
 }
 
 document.getElementById('closePendingBtn').addEventListener('click', ()=>{
@@ -1370,6 +1585,7 @@ document.getElementById('syncBtn').addEventListener('click', openSync);
 document.getElementById('modeMainBtn').addEventListener('click', ()=> switchDataMode('main'));
 document.getElementById('modeDraftBtn').addEventListener('click', ()=> switchDataMode('draft'));
 document.getElementById('modeReviewBtn').addEventListener('click', openReviewPanel);
+document.getElementById('submitDraftBtn').addEventListener('click', submitDraftForReview);
 document.getElementById('closeSyncBtn').addEventListener('click', closeSync);
 document.getElementById('syncLoginBtn').addEventListener('click', loginCloud);
 document.getElementById('syncSignUpBtn').addEventListener('click', signUpCloud);
@@ -1497,13 +1713,16 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
       }
       html += `<div class="p-household">Hộ ${escapeHtml(g.household)} (${g.members.length} người)</div>
         <table>
-          <thead><tr><th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Địa chỉ</th></tr></thead>
+          <thead><tr><th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Dân tộc</th><th>Tôn giáo</th><th>Địa chỉ</th><th>Ghi chú</th></tr></thead>
           <tbody>
             ${g.members.map(m=>`<tr>
               <td>${escapeHtml(m.name||'')}</td>
               <td>${escapeHtml(m.cccd||'')}</td>
               <td>${escapeHtml(m.year||'')}</td>
+              <td>${escapeHtml(m.ethnicity||'')}</td>
+              <td>${escapeHtml(m.religion||'')}</td>
               <td>${escapeHtml(m.address||'')}</td>
+              <td>${escapeHtml(m.note||'')}</td>
             </tr>`).join('')}
           </tbody>
         </table>`;
@@ -1513,6 +1732,5 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   window.print();
 });
 </script>
-</div>
 </body>
 </html>
