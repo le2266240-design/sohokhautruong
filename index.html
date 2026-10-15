@@ -51,6 +51,9 @@
 
   /* biểu tượng ngôi nhà (avatar của mỗi thành viên) */
   --house:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9'/%3E%3C/svg%3E");
+  /* ghim và vương miện (đánh dấu chủ hộ) */
+  --pin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='17' x2='12' y2='22'/%3E%3Cpath d='M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24z'/%3E%3C/svg%3E");
+  --crown:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232B1F00' stroke='%232B1F00' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z'/%3E%3C/svg%3E");
   /* họa tiết sóng nước lặp lại */
   --wave-tile:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='24' viewBox='0 0 64 24'%3E%3Cpath d='M0 12 Q8 4 16 12 T32 12 T48 12 T64 12' fill='none' stroke='%230F6B5C' stroke-opacity='.075' stroke-width='1.4'/%3E%3C/svg%3E");
   --wave-tile-light:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='24' viewBox='0 0 64 24'%3E%3Cpath d='M0 12 Q8 4 16 12 T32 12 T48 12 T64 12' fill='none' stroke='white' stroke-opacity='.09' stroke-width='1.4'/%3E%3C/svg%3E");
@@ -89,6 +92,16 @@ button{cursor:pointer;}
 .btn.secondary:hover{background:var(--paper);border-color:var(--teal);}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .btn.small{padding:6px 12px;font-size:12.5px;min-height:34px;}
+.btn.danger{background:var(--danger);}
+.btn.danger:hover{background:#8F1D17;}
+
+/* nút quay lại kết quả tìm kiếm */
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;margin:0 0 8px;padding:7px 14px 7px 10px;min-height:36px;
+  background:var(--teal);color:#fff;border:none;border-radius:999px;font-size:13px;font-weight:600;
+  transition:background .15s var(--ease), transform .12s var(--ease);
+}
+.back-link:hover{background:var(--teal-deep);transform:translateX(-2px);}
 
 /* =========================================================
    LAYOUT: sidebar tối bên trái + nội dung bên phải
@@ -160,8 +173,8 @@ button{cursor:pointer;}
 }
 .household-item:hover{background:rgba(255,255,255,.1);transform:translateX(2px);}
 .household-item.active{background:var(--sun-soft);color:var(--teal-ink);border-left-color:#fff;font-weight:600;}
-.household-item .hnum{font-weight:600;}
-.household-item .htonum{font-size:11px;color:inherit;opacity:.72;display:block;margin-top:1px;font-weight:400;}
+.household-item .hnum{font-weight:600;min-width:0;overflow:hidden;}
+.household-item .htonum{font-size:11px;color:inherit;opacity:.78;display:block;margin-top:1px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .household-item .hcount{font-size:12px;color:inherit;opacity:.8;white-space:nowrap;flex-shrink:0;}
 .empty-note{padding:20px 6px;color:var(--ink-soft);font-size:13px;line-height:1.7;}
 .side-foot{padding-top:12px;margin-top:10px;border-top:1px solid rgba(255,255,255,.15);}
@@ -320,6 +333,33 @@ button{cursor:pointer;}
 .record-actions .edit-btn:hover{border-color:var(--green);color:var(--green);background:var(--success-bg);}
 .record-actions .del-btn:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-bg);}
 
+/* ---------- CHỦ HỘ ---------- */
+.head-badge{
+  display:inline-flex;align-items:center;gap:4px;align-self:center;
+  background:linear-gradient(145deg,var(--sun-soft),var(--sun));color:#2B1F00;
+  font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.02em;
+  padding:2px 9px;border-radius:999px;box-shadow:0 1px 2px rgba(138,95,5,.3);
+}
+.head-inline{
+  display:inline-block;margin-left:6px;font-family:var(--font-ui);font-size:12px;font-weight:600;
+  color:var(--sun-deep);background:var(--warn-bg);border:1px solid #F1D56B;padding:1px 9px;border-radius:999px;
+}
+.record-row.is-head{
+  background:linear-gradient(90deg,rgba(243,194,90,.16),rgba(243,194,90,0) 55%);
+  box-shadow:inset 4px 0 0 var(--sun);
+}
+.record-row.is-head::before{
+  background:var(--crown) center/22px no-repeat, linear-gradient(145deg,var(--sun-soft),var(--sun));
+}
+.record-row.is-head:hover{background:linear-gradient(90deg,rgba(243,194,90,.24),rgba(243,194,90,.02) 55%);}
+.head-btn::before{
+  content:"";display:inline-block;width:13px;height:13px;margin-right:5px;vertical-align:-2px;background:currentColor;
+  -webkit-mask:var(--pin) center/contain no-repeat;mask:var(--pin) center/contain no-repeat;
+}
+.record-actions .head-btn:hover{border-color:var(--sun);color:var(--sun-deep);background:var(--warn-bg);}
+.record-actions .head-btn.on{border-color:var(--sun);color:#2B1F00;background:var(--sun-soft);}
+.record-actions .head-btn.on:hover{background:var(--sun);}
+
 .no-select-msg{padding:64px 24px;text-align:center;color:var(--ink-soft);font-size:14.5px;line-height:1.7;}
 .no-select-msg strong{color:var(--teal-deep);display:block;font-family:var(--font-serif);font-size:19px;margin-bottom:6px;}
 .no-select-msg::before{
@@ -364,6 +404,36 @@ button{cursor:pointer;}
 .field textarea{resize:vertical;min-height:60px;}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,107,92,.14);background:#fff;}
 .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap;}
+
+/* ô tích "chủ hộ" trong form */
+.check-field .check{
+  display:flex;align-items:center;gap:10px;margin:0;padding:11px 12px;cursor:pointer;
+  background:var(--warn-bg);border:1px solid #F1D56B;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:600;color:var(--sun-deep);
+}
+.check-field .check input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;margin:0;accent-color:var(--teal);flex-shrink:0;}
+
+/* hộp thoại lựa chọn (xóa, đổi hộ) */
+#choiceOverlay{z-index:95;}
+.form-actions.vertical{flex-direction:column;align-items:stretch;gap:8px;}
+.form-actions.vertical .btn{width:100%;justify-content:center;}
+.check-field .head-hint{margin:6px 2px 0;font-size:12px;line-height:1.5;color:var(--sun-deep);}
+.check-field .head-hint:empty{display:none;}
+.check-field .check.disabled{opacity:.6;cursor:not-allowed;}
+.choice-card{max-width:500px;}
+.choice-card h3{margin-bottom:12px;}
+#choiceBody p{margin:0 0 10px;font-size:14px;line-height:1.6;color:var(--ink);}
+#choiceBody .choice-muted{font-size:12.5px;color:var(--ink-soft);}
+.choice-route{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin:12px 0;padding:12px;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-md);font-size:13.5px;font-weight:600;color:var(--ink-soft);
+}
+.choice-route b{color:var(--sun-deep);font-size:18px;}
+.choice-route .to{color:var(--teal-deep);background:#fff;border:1.5px solid var(--teal);border-radius:8px;padding:3px 10px;}
+.choice-warn{
+  margin:0 0 10px;padding:10px 12px;font-size:13px;line-height:1.55;color:#6B4A00;
+  background:var(--warn-bg);border:1px solid #F1D56B;border-left:4px solid var(--sun);border-radius:var(--radius-sm);
+}
 .data-textarea{
   width:100%;height:220px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px;
   font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--ink);background:var(--paper);resize:vertical;
@@ -735,6 +805,10 @@ body.locked #mainApp{display:none;}
       <div class="main-panel">
         <div class="main-header">
           <div>
+            <button class="back-link" id="backToSearchBtn" style="display:none;">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              <span id="backToSearchLabel">Quay lại kết quả tìm kiếm</span>
+            </button>
             <h2 id="mainTitle">Chọn một hộ để xem</h2>
             <div class="sub" id="mainSub">hoặc tìm kiếm ở góc trên</div>
           </div>
@@ -764,11 +838,20 @@ body.locked #mainApp{display:none;}
       <div class="field"><label for="fTo">Tổ</label><input id="fTo" type="text" placeholder="14"></div>
       <div class="field"><label for="fHousehold">Số hộ</label><input id="fHousehold" type="text" placeholder="1"></div>
       <div class="field span-2"><label for="fNote">Ghi chú</label><textarea id="fNote" rows="2" placeholder="Tạm vắng, chuyển đi, bổ sung sau..."></textarea></div>
+      <div class="field span-2 check-field"><label class="check" for="fIsHead"><input id="fIsHead" type="checkbox"><span>&#9733; Đặt làm chủ hộ của hộ này</span></label><div class="head-hint" id="fIsHeadHint"></div></div>
     </div>
     <div class="form-actions">
       <button class="btn secondary" id="cancelBtn">Hủy</button>
       <button class="btn" id="saveBtn">Lưu thành viên</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="choiceOverlay" role="alertdialog" aria-modal="true" aria-labelledby="choiceTitle">
+  <div class="form-card choice-card">
+    <h3 id="choiceTitle"></h3>
+    <div id="choiceBody"></div>
+    <div class="form-actions" id="choiceActions"></div>
   </div>
 </div>
 
@@ -1211,6 +1294,9 @@ function groupByHousehold(list){
     if(!groups[key]) groups[key] = { to, household: hh, members: [] };
     groups[key].members.push(m);
   });
+  Object.keys(groups).forEach(k=>{
+    groups[k].members.sort((a,b)=> (b.isHead?1:0) - (a.isHead?1:0)); // chủ hộ lên đầu (sắp xếp ổn định)
+  });
   return groups;
 }
 
@@ -1246,9 +1332,11 @@ function renderHouseholdList(){
     </li>`;
   listEl.innerHTML = allItem + keys.map(k=>{
     const g = groups[k];
+    const headM = g.members.find(m=>m.isHead);
+    const headLine = headM ? ` &middot; Chủ hộ: ${escapeHtml(headM.name||'')}` : '';
     const label = selectedTo==='__ALL__'
-      ? `Tổ ${escapeHtml(g.to)} <span class="htonum">Hộ ${escapeHtml(g.household)}</span>`
-      : `Hộ ${escapeHtml(g.household)}`;
+      ? `Tổ ${escapeHtml(g.to)} <span class="htonum">Hộ ${escapeHtml(g.household)}${headLine}</span>`
+      : `Hộ ${escapeHtml(g.household)}${headM ? ` <span class="htonum">Chủ hộ: ${escapeHtml(headM.name||'')}</span>` : ''}`;
     return `
     <li class="household-item ${selectedHousehold===k?'active':''}" data-key="${escapeAttr(k)}">
       <span class="hnum">${label}</span>
@@ -1257,6 +1345,7 @@ function renderHouseholdList(){
   }).join('');
   listEl.querySelectorAll('.household-item').forEach(el=>{
     el.addEventListener('click', ()=>{
+      clearSearchReturn();
       selectedHousehold = el.getAttribute('data-key');
       document.getElementById('searchInput').value='';
       document.getElementById('searchYearInput').value='';
@@ -1266,6 +1355,7 @@ function renderHouseholdList(){
 }
 
 document.getElementById('toSelect').addEventListener('change', (e)=>{
+  clearSearchReturn();
   selectedTo = e.target.value;
   selectedHousehold = '__ALL__';
   document.getElementById('searchInput').value='';
@@ -1277,6 +1367,131 @@ function birthYearOf(m){
   const s = String(m.year||'').trim();
   const match = s.match(/(\d{4})\s*$/); // lấy đúng 4 số cuối cùng (năm), bỏ qua ngày/tháng
   return match ? match[1] : '';
+}
+
+// ===== QUAY LẠI KẾT QUẢ TÌM KIẾM =====
+// Khi bấm "Xem cả hộ" từ kết quả tìm kiếm, nhớ lại từ khóa để có thể quay lại đúng chỗ.
+let searchReturn = null; // { q, y, to, hh, scrollY, label }
+function clearSearchReturn(){
+  if(!searchReturn) return;
+  searchReturn = null;
+  try{ if(history.state && history.state.hhView) history.back(); }catch(e){}
+}
+function restoreSearchReturn(){
+  if(!searchReturn) return;
+  const r = searchReturn;
+  searchReturn = null;
+  document.getElementById('searchInput').value = r.q;
+  document.getElementById('searchYearInput').value = r.y;
+  selectedTo = r.to;
+  selectedHousehold = r.hh;
+  render();
+  window.scrollTo(0, r.scrollY || 0);
+}
+
+// ===== HỘP THOẠI LỰA CHỌN (thay cho confirm/alert để có nút Hủy rõ nghĩa) =====
+// Trả về key của nút được bấm. Esc / bấm nền tối / nút Hủy đều trả 'cancel'.
+function askChoice(opts){
+  return new Promise(resolve=>{
+    const ov = document.getElementById('choiceOverlay');
+    const act = document.getElementById('choiceActions');
+    document.getElementById('choiceTitle').textContent = opts.title || '';
+    document.getElementById('choiceBody').innerHTML = opts.bodyHtml || '';
+    act.innerHTML = '';
+    act.className = 'form-actions' + (opts.vertical ? ' vertical' : '');
+    const btnByKey = {};
+    let done = false;
+    function finish(key){
+      if(done) return;
+      done = true;
+      ov.classList.remove('show');
+      window.removeEventListener('keydown', onKey, true);
+      ov.removeEventListener('mousedown', onBackdrop);
+      resolve(key);
+    }
+    function onKey(e){
+      if(e.key === 'Escape'){ e.preventDefault(); e.stopImmediatePropagation(); finish('cancel'); }
+    }
+    function onBackdrop(e){ if(e.target === ov) finish('cancel'); }
+    (opts.buttons || []).forEach(b=>{
+      const el = document.createElement('button');
+      el.className = 'btn' + (b.cls ? ' ' + b.cls : '');
+      el.textContent = b.label;
+      el.addEventListener('click', ()=> finish(b.key));
+      btnByKey[b.key] = el;
+      act.appendChild(el);
+    });
+    window.addEventListener('keydown', onKey, true);
+    ov.addEventListener('mousedown', onBackdrop);
+    ov.classList.add('show');
+    const focusEl = btnByKey[opts.focus] || act.firstChild; // mặc định đặt con trỏ ở nút an toàn (Hủy)
+    if(focusEl) focusEl.focus();
+  });
+}
+
+// ===== CHỦ HỘ =====
+// Mỗi hộ (cặp Tổ + Số hộ) có tối đa 1 người được ghim chủ hộ (m.isHead === true).
+function sameHousehold(a, b){
+  return (a.to||'') === (b.to||'') && (a.household||'') === (b.household||'');
+}
+function headOfHousehold(to, hh){
+  return members.find(m => m.isHead && (m.to||'(chưa có tổ)') === to && (m.household||'(chưa có số hộ)') === hh) || null;
+}
+// Giữ tối đa 1 chủ hộ mỗi hộ (dùng khi gộp nháp / nhập dữ liệu). Người đứng trước được giữ.
+function dedupeHeads(list){
+  const seen = {};
+  list.forEach(m=>{
+    if(!m.isHead) return;
+    const key = (m.to||'') + '||' + (m.household||'');
+    if(!m.household || seen[key]){ delete m.isHead; } else { seen[key] = true; }
+  });
+  return list;
+}
+async function changeHead(id){
+  if(!canEditCurrentMode()){ alert('Bạn không có quyền sửa danh sách chính.'); return; }
+  const cur = members.find(x=>String(x.id)===String(id));
+  if(!cur || !cur.isHead) return;
+  const mates = members.filter(x => x !== cur && sameHousehold(x, cur));
+  const buttons = mates.map(m => ({ key: 'id:' + m.id, label: '★ ' + (m.name || '(chưa có tên)') }));
+  buttons.push({ key:'unpin', label:'Bỏ ghim — hộ không có chủ hộ', cls:'secondary' });
+  buttons.push({ key:'cancel', label:'Hủy, giữ nguyên', cls:'secondary' });
+  const place = `Tổ ${escapeHtml(cur.to||'')} — Hộ ${escapeHtml(cur.household||'')}`;
+  const choice = await askChoice({
+    title: 'Đổi chủ hộ',
+    vertical: true,
+    focus: 'cancel',
+    bodyHtml:
+      `<p>Chủ hộ hiện tại của <b>${place}</b> là <b>${escapeHtml(cur.name||'')}</b>.</p>` +
+      (mates.length
+        ? `<p>Chọn người sẽ làm chủ hộ mới:</p>`
+        : `<p class="choice-muted">Hộ chỉ có một người. Bạn có thể bỏ ghim nếu muốn.</p>`),
+    buttons
+  });
+  if(choice === 'cancel') return;
+  if(choice === 'unpin'){
+    delete cur.isHead;
+  }else if(String(choice).indexOf('id:') === 0){
+    const target = mates.find(m => 'id:' + m.id === choice);
+    if(!target) return;
+    delete cur.isHead;
+    target.isHead = true;
+  }
+  await saveData();
+  render();
+}
+async function toggleHead(id){
+  if(!canEditCurrentMode()){ alert('Bạn không có quyền sửa danh sách chính.'); return; }
+  const m = members.find(x=>String(x.id)===String(id));
+  if(!m) return;
+  if(!m.household){ alert('Hãy nhập Số hộ cho thành viên này trước khi ghim chủ hộ.'); return; }
+  if(m.isHead){
+    delete m.isHead;
+  }else{
+    members.forEach(x=>{ if(x !== m && sameHousehold(x, m)) delete x.isHead; });
+    m.isHead = true;
+  }
+  await saveData();
+  render();
 }
 
 function renderMain(){
@@ -1322,7 +1537,9 @@ function renderMain(){
       const fullCount = members.filter(m =>
         (m.to||'(chưa có tổ)') === g.to && (m.household||'(chưa có số hộ)') === g.household
       ).length;
-      const heading = `Tổ ${escapeHtml(g.to)} &mdash; Hộ ${escapeHtml(g.household)}`;
+      const searchHead = headOfHousehold(g.to, g.household);
+      const heading = `Tổ ${escapeHtml(g.to)} &mdash; Hộ ${escapeHtml(g.household)}`
+        + (searchHead ? ` <span class="head-inline">&#9733; Chủ hộ: ${escapeHtml(searchHead.name||'')}</span>` : '');
       return `
       <div style="margin-bottom:26px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
@@ -1338,11 +1555,21 @@ function renderMain(){
     attachDeleteHandlers();
     content.querySelectorAll('.view-household-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
+        searchReturn = {
+          q: document.getElementById('searchInput').value,
+          y: document.getElementById('searchYearInput').value,
+          to: selectedTo,
+          hh: selectedHousehold,
+          scrollY: window.scrollY,
+          label: labelParts.join(' + ')
+        };
+        try{ history.pushState({ hhView: true }, ''); }catch(e){}
         selectedTo = '__ALL__';
         selectedHousehold = btn.getAttribute('data-key');
         document.getElementById('searchInput').value = '';
         document.getElementById('searchYearInput').value = '';
         render();
+        window.scrollTo(0, 0);
       });
     });
     return;
@@ -1367,9 +1594,10 @@ function renderMain(){
       const heading = selectedTo==='__ALL__'
         ? `Tổ ${escapeHtml(g.to)} &mdash; Hộ ${escapeHtml(g.household)}`
         : `Hộ ${escapeHtml(g.household)}`;
+      const allHead = g.members.find(m=>m.isHead);
       return `
       <div class="hh-head">
-        <div class="hh-title">${heading} <span class="count">&mdash; ${g.members.length} người</span></div>
+        <div class="hh-title">${heading} <span class="count">&mdash; ${g.members.length} người</span>${allHead ? ` <span class="head-inline">&#9733; Chủ hộ: ${escapeHtml(allHead.name||'')}</span>` : ''}</div>
         <div class="hh-actions"><button class="btn secondary small print-hh-btn" data-key="${escapeAttr(k)}">In hộ</button></div>
       </div>
       ${memberTable(g.members, false)}
@@ -1382,7 +1610,8 @@ function renderMain(){
   const g = groups[selectedHousehold];
   const list = g ? g.members : [];
   title.textContent = g ? `Tổ ${g.to} — Hộ ${g.household}` : 'Hộ';
-  sub.textContent = `${list.length} thành viên`;
+  const oneHead = list.find(m=>m.isHead);
+  sub.textContent = `${list.length} thành viên · ` + (oneHead ? `Chủ hộ: ${oneHead.name||''}` : 'chưa ghim chủ hộ');
   content.innerHTML = memberTable(list, false);
   attachDeleteHandlers();
 }
@@ -1392,16 +1621,25 @@ function memberTable(list, showMeta, canEdit){
   if(list.length === 0){
     return `<div class="members"><div class="empty-note">Chưa có ai ở đây.</div></div>`;
   }
+  // các hộ (Tổ||Số hộ) đã có chủ hộ -> các thành viên khác trong hộ không hiện nút ghim nữa
+  const headKeys = new Set(members.filter(x=>x.isHead).map(x=>(x.to||'') + '||' + (x.household||'')));
   return `<div class="members">${list.map(m=>{
     const line2Parts = [];
     if(m.year) line2Parts.push(`Sinh ${escapeHtml(m.year)}`);
     if(m.ethnicity) line2Parts.push(`Dân tộc ${escapeHtml(m.ethnicity)}`);
     if(m.religion) line2Parts.push(`Tôn giáo ${escapeHtml(m.religion)}`);
+    let headBtnHtml = '';
+    if(m.isHead){
+      headBtnHtml = `<button class="head-btn on" data-id="${m.id}" title="Đổi chủ hộ hoặc bỏ ghim">Đổi chủ hộ</button>`;
+    }else if(m.household && !headKeys.has((m.to||'') + '||' + (m.household||''))){
+      headBtnHtml = `<button class="head-btn" data-id="${m.id}" title="Ghim làm chủ hộ">Ghim chủ hộ</button>`;
+    }
     return `
-    <div class="record-row">
+    <div class="record-row${m.isHead ? ' is-head' : ''}">
       <div class="record-main">
         <div class="record-line1">
           <span class="record-name">${escapeHtml(m.name||'(chưa có tên)')}</span>
+          ${m.isHead ? '<span class="head-badge">&#9733; Chủ hộ</span>' : ''}
           ${m.cccd ? `<span class="record-cccd">${escapeHtml(m.cccd)}</span>` : ''}
         </div>
         ${line2Parts.length ? `<div class="record-line2">${line2Parts.map(p=>`<span>${p}</span>`).join('')}</div>` : ''}
@@ -1410,6 +1648,7 @@ function memberTable(list, showMeta, canEdit){
         ${showMeta ? `<div class="record-tag">Tổ ${escapeHtml(m.to||'')} — Hộ ${escapeHtml(m.household||'')}</div>` : ''}
       </div>
       ${canEdit ? `<div class="record-actions">
+        ${headBtnHtml}
         <button class="edit-btn" data-id="${m.id}">Sửa</button>
         <button class="del-btn" data-id="${m.id}">Xóa</button>
       </div>` : ''}
@@ -1423,11 +1662,32 @@ function attachDeleteHandlers(){
       if(!canEditCurrentMode()){ alert('Bạn không có quyền xoá ở danh sách chính.'); return; }
       const id = btn.getAttribute('data-id');
       const delTarget = members.find(m=>String(m.id)===id);
-      const delWho = (delTarget && delTarget.name) ? ` "${delTarget.name}"` : '';
-      if(!confirm(`⚠️ Bạn có chắc chắn muốn xóa thành viên${delWho} không?\n\nThao tác này không thể hoàn tác.`)) return;
+      if(!delTarget) return;
+      const delMates = members.filter(m=>String(m.id)!==id && sameHousehold(m, delTarget) && delTarget.household).length;
+      const delPlace = delTarget.household ? ` (Tổ ${escapeHtml(delTarget.to||'')} — Hộ ${escapeHtml(delTarget.household)})` : '';
+      const delChoice = await askChoice({
+        title: 'Xóa thành viên này?',
+        bodyHtml:
+          `<p>Bạn có chắc chắn muốn xóa <b>${escapeHtml(delTarget.name||'(chưa có tên)')}</b>${delPlace} không?</p>` +
+          (delTarget.isHead && delMates > 0
+            ? `<div class="choice-warn">Người này đang là <b>chủ hộ</b>. Sau khi xóa, hộ còn ${delMates} người và chưa có chủ hộ &mdash; hãy ghim chủ hộ mới.</div>`
+            : '') +
+          `<p class="choice-muted">Thao tác này không thể hoàn tác.</p>`,
+        buttons: [
+          { key:'cancel', label:'Không xóa', cls:'secondary' },
+          { key:'delete', label:'Xóa thành viên', cls:'danger' }
+        ]
+      });
+      if(delChoice !== 'delete') return;
       members = members.filter(m=>String(m.id)!==id);
       await saveData();
       render();
+    });
+  });
+  document.querySelectorAll('.head-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const hid = btn.getAttribute('data-id');
+      if(btn.classList.contains('on')) changeHead(hid); else toggleHead(hid);
     });
   });
   document.querySelectorAll('.edit-btn').forEach(btn=>{
@@ -1456,6 +1716,29 @@ function escapeAttr(str){ return escapeHtml(str); }
 const overlay = document.getElementById('overlay');
 let editingId = null;
 
+function refreshHeadCheckbox(){
+  const cb = document.getElementById('fIsHead');
+  const hint = document.getElementById('fIsHeadHint');
+  const label = cb.closest('.check');
+  const to = document.getElementById('fTo').value.trim() || '14';
+  const hh = document.getElementById('fHousehold').value.trim();
+  const editing = editingId ? members.find(m=>String(m.id)===String(editingId)) : null;
+  // người đang là chủ hộ thì không khóa (khi chuyển hộ, phần lưu sẽ tự xử lý)
+  const other = (hh && !(editing && editing.isHead))
+    ? members.find(m => m.isHead && m !== editing && (m.to||'') === to && (m.household||'') === hh)
+    : null;
+  if(other){
+    cb.checked = false;
+    cb.disabled = true;
+    label.classList.add('disabled');
+    hint.textContent = `Hộ này đã có chủ hộ: ${other.name||''}. Muốn thay, bấm nút "Đổi chủ hộ" ở dòng của chủ hộ.`;
+  }else{
+    cb.disabled = false;
+    label.classList.remove('disabled');
+    hint.textContent = '';
+  }
+}
+
 function openMemberForm(existing){
   editingId = existing ? existing.id : null;
   document.getElementById('formTitle').textContent = existing ? 'Sửa thông tin thành viên' : 'Thêm thành viên mới';
@@ -1467,6 +1750,7 @@ function openMemberForm(existing){
   document.getElementById('fReligion').value = existing ? (existing.religion||'') : '';
   document.getElementById('fAddr').value = existing ? (existing.address||'') : '';
   document.getElementById('fNote').value = existing ? (existing.note||'') : '';
+  document.getElementById('fIsHead').checked = !!(existing && existing.isHead);
   let defaultHousehold = '';
   if(!existing && selectedHousehold && selectedHousehold !== '__ALL__' && selectedHousehold.indexOf('||') !== -1){
     defaultHousehold = selectedHousehold.split('||')[1];
@@ -1478,9 +1762,13 @@ function openMemberForm(existing){
   document.getElementById('fHousehold').value = existing
     ? (existing.household||'')
     : defaultHousehold;
+  refreshHeadCheckbox();
   overlay.classList.add('show');
   document.getElementById('fName').focus();
 }
+
+document.getElementById('fTo').addEventListener('input', refreshHeadCheckbox);
+document.getElementById('fHousehold').addEventListener('input', refreshHeadCheckbox);
 
 document.getElementById('addBtn').addEventListener('click', ()=>{
   if(!canEditCurrentMode()){
@@ -1535,33 +1823,117 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   const household = document.getElementById('fHousehold').value.trim();
   const note = document.getElementById('fNote').value.trim();
   if(!name){ document.getElementById('fName').focus(); return; }
+  const wantHead = document.getElementById('fIsHead').checked;
+  if(wantHead && !household){
+    alert('Hãy nhập Số hộ trước khi đặt làm chủ hộ.');
+    document.getElementById('fHousehold').focus();
+    return;
+  }
+  const record = { name, cccd, year, ethnicity, religion, address: addr, to, household, note };
+  let subject = null;     // người đang được lưu
+  let wasHead = false;    // trước khi sửa người này có phải chủ hộ không
+  let movedIds = [];      // những người bị đổi Tổ/Số hộ trong lần lưu này
+
   if(editingId){
-    const idx = members.findIndex(m=>String(m.id)===String(editingId));
-    if(idx !== -1){
-      const oldTo = members[idx].to || '';
-      const oldHh = members[idx].household || '';
-      members[idx] = { ...members[idx], name, cccd, year, ethnicity, religion, address: addr, to, household, note };
-      // Nếu đổi Tổ hoặc Số hộ: hỏi có đổi đồng loạt cho cả hộ (những người cùng Tổ + cùng Số hộ cũ) không
-      if(oldTo !== to || oldHh !== household){
-        const sameHousehold = members.filter(m =>
-          String(m.id) !== String(editingId) &&
-          (m.to || '') === oldTo && (m.household || '') === oldHh
-        );
-        if(sameHousehold.length > 0){
-          const applyAll = confirm(
-            `Bạn vừa đổi Tổ/Số hộ của "${name}".\n\n` +
-            `Hộ cũ (Tổ ${oldTo || '?'} — Hộ ${oldHh || '?'}) còn ${sameHousehold.length} thành viên khác.\n\n` +
-            `Bấm OK để chuyển TẤT CẢ ${sameHousehold.length + 1} người trong hộ sang Tổ ${to} — Hộ ${household || '(chưa có số hộ)'}.\n` +
-            `Bấm Hủy để chỉ đổi riêng người này (tách khỏi hộ).`
-          );
-          if(applyAll){
-            sameHousehold.forEach(m => { m.to = to; m.household = household; });
-          }
+    const cur = members.find(m=>String(m.id)===String(editingId));
+    if(cur){
+      wasHead = !!cur.isHead;
+      const oldTo = cur.to || '';
+      const oldHh = cur.household || '';
+      const moved = (oldTo !== to) || (oldHh !== household);
+      // những người khác cùng hộ cũ (chỉ tính khi hộ cũ có số hộ thật)
+      const mates = (moved && oldHh)
+        ? members.filter(m => m !== cur && (m.to||'') === oldTo && (m.household||'') === oldHh)
+        : [];
+      let choice = 'single';
+
+      // ---- HỎI TRƯỚC KHI ĐỤNG VÀO DỮ LIỆU ----
+      if(mates.length > 0){
+        const leaderMoving = wasHead && wantHead;                 // đang sửa chính chủ hộ
+        const hhHasOtherHead = mates.some(m=>m.isHead);           // hộ cũ đã có chủ hộ khác
+        const targetCount = members.filter(m => m !== cur && !mates.includes(m) &&
+          (m.to||'') === to && (m.household||'') === household).length;
+        const names = mates.slice(0,6).map(m=>escapeHtml(m.name||'(chưa có tên)')).join(', ') + (mates.length > 6 ? '…' : '');
+        const route =
+          `<div class="choice-route"><span>Tổ ${escapeHtml(oldTo||'?')} &middot; Hộ ${escapeHtml(oldHh||'?')}</span>` +
+          `<b>&rarr;</b><span class="to">Tổ ${escapeHtml(to||'?')} &middot; Hộ ${escapeHtml(household||'(chưa có)')}</span></div>`;
+        const mergeWarn = targetCount > 0
+          ? `<div class="choice-warn">Hộ đích đã có ${targetCount} người &mdash; các thành viên chuyển sang sẽ được <b>gộp</b> vào hộ đó.</div>` : '';
+        const who = `<b>${escapeHtml(name)}</b>`;
+        const roster = `<p class="choice-muted">Những người còn lại trong hộ (${mates.length}): ${names}</p>`;
+        let dlg;
+        if(leaderMoving){
+          dlg = {
+            title: 'Đổi Tổ / Số hộ cho cả hộ?',
+            bodyHtml: `<p>${who} là <b>chủ hộ</b>. Khi đổi Tổ/Số hộ của chủ hộ, <b>cả hộ (${mates.length + 1} người)</b> sẽ được chuyển theo.</p>` +
+              route + mergeWarn + roster +
+              `<p class="choice-muted">Muốn chuyển riêng ${who}, hãy bỏ ghim chủ hộ trước.</p>`,
+            buttons: [
+              { key:'cancel', label:'Hủy, giữ nguyên', cls:'secondary' },
+              { key:'all', label:`Đổi cả hộ (${mates.length + 1} người)` }
+            ]
+          };
+        }else if(hhHasOtherHead){
+          const hd = mates.find(m=>m.isHead);
+          dlg = {
+            title: 'Chuyển riêng một thành viên?',
+            bodyHtml: `<p>${who} sẽ được <b>tách khỏi hộ</b> và chuyển sang hộ mới. Những người còn lại giữ nguyên.</p>` +
+              route + mergeWarn + roster +
+              `<p class="choice-muted">Muốn chuyển cả hộ, hãy sửa Tổ/Số hộ của chủ hộ <b>${escapeHtml(hd.name||'')}</b>.</p>`,
+            buttons: [
+              { key:'cancel', label:'Hủy, giữ nguyên', cls:'secondary' },
+              { key:'single', label:'Chuyển riêng người này' }
+            ]
+          };
+        }else{
+          dlg = {
+            title: 'Đổi Tổ / Số hộ',
+            bodyHtml: `<p>Hộ này chưa ghim chủ hộ. Bạn muốn đổi cho ai?</p>` +
+              route + mergeWarn + roster +
+              `<p class="choice-muted">Mẹo: ghim chủ hộ để lần sau đổi cả hộ chỉ cần sửa một người.</p>`,
+            buttons: [
+              { key:'cancel', label:'Hủy, giữ nguyên', cls:'secondary' },
+              { key:'single', label:'Chỉ người này', cls:'secondary' },
+              { key:'all', label:`Cả hộ (${mates.length + 1} người)` }
+            ]
+          };
+        }
+        choice = await askChoice(dlg);
+        if(choice === 'cancel') return;   // HỦY = không thay đổi gì cả; form vẫn mở để bạn chỉnh tiếp
+      }
+
+      // ---- ĐẾN ĐÂY MỚI THỰC SỰ ĐỔI DỮ LIỆU ----
+      Object.assign(cur, record);
+      subject = cur;
+      if(moved){
+        movedIds = [cur.id];
+        if(choice === 'all'){
+          mates.forEach(m => { m.to = to; m.household = household; movedIds.push(m.id); });
         }
       }
     }
   }else{
-    members.push({ id: Date.now()+Math.random(), name, cccd, year, ethnicity, religion, address: addr, to, household, note });
+    subject = { id: Date.now()+Math.random(), ...record };
+    members.push(subject);
+    movedIds = [subject.id];
+  }
+
+  if(subject){
+    // Chủ hộ: tối đa 1 người / hộ
+    if(wantHead && household){
+      const rivals = members.filter(m => m !== subject && sameHousehold(m, subject) && m.isHead);
+      if(wasHead && rivals.length){ delete subject.isHead; }                 // chuyển vào hộ đã có chủ hộ: giữ chủ hộ sẵn có
+      else{ rivals.forEach(m => delete m.isHead); subject.isHead = true; }   // ghim mới: người này làm chủ hộ
+    }else{
+      delete subject.isHead;
+    }
+    // Nếu gộp hộ khiến có 2 chủ hộ: giữ người đã ở hộ đích từ trước
+    const heads = members.filter(m => m.isHead && sameHousehold(m, subject));
+    if(heads.length > 1){
+      const movedSet = new Set(movedIds.map(String));
+      const stay = heads.filter(m => !movedSet.has(String(m.id)));
+      (stay.length ? heads.filter(m => movedSet.has(String(m.id))) : heads.slice(1)).forEach(m => delete m.isHead);
+    }
   }
   await saveData();
   selectedTo = to;
@@ -1571,8 +1943,8 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   render();
 });
 
-document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('searchYearInput').addEventListener('input', render);
+document.getElementById('searchInput').addEventListener('input', ()=>{ clearSearchReturn(); render(); });
+document.getElementById('searchYearInput').addEventListener('input', ()=>{ clearSearchReturn(); render(); });
 
 // TẠO BẢN "CHỈ XEM" — một file HTML riêng, độc lập, không có bất kỳ nút
 // Thêm/Sửa/Xóa/Nhập/Khôi phục nào, chỉ để xem, tìm kiếm, lọc theo Tổ và in.
@@ -1667,7 +2039,7 @@ function buildViewOnlyHtml(){
   lines.push('  document.getElementById("count").textContent = list.length + " nguoi";');
   lines.push('  var html = "<table><thead><tr><th>To</th><th>Ho</th><th>Ho va ten</th><th>So CCCD</th><th>Ngay sinh</th><th>Dan toc</th><th>Ton giao</th><th>Dia chi</th><th>Ghi chu</th></tr></thead><tbody>";');
   lines.push('  list.forEach(function(m){');
-  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.ethnicity) + "</td><td>" + esc(m.religion) + "</td><td>" + esc(m.address) + "</td><td>" + esc(m.note) + "</td></tr>";');
+  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + (m.isHead ? " (Chu ho)" : "") + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.ethnicity) + "</td><td>" + esc(m.religion) + "</td><td>" + esc(m.address) + "</td><td>" + esc(m.note) + "</td></tr>";');
   lines.push('  });');
   lines.push('  html += "</tbody></table>";');
   lines.push('  document.getElementById("tableArea").innerHTML = list.length ? html : "<p>Khong tim thay ket qua.</p>";');
@@ -1832,7 +2204,7 @@ document.getElementById('doImportBtn').addEventListener('click', async ()=>{
     const data = JSON.parse(raw);
     if(!Array.isArray(data)) throw new Error('sai định dạng');
     const merge = confirm(`Tìm thấy ${data.length} thành viên.\n\nBấm OK để GỘP vào dữ liệu hiện có.\nBấm Hủy để THAY THẾ toàn bộ dữ liệu hiện có.`);
-    members = ensureToField(merge ? members.concat(data) : data);
+    members = dedupeHeads(ensureToField(merge ? members.concat(data) : data));
     await saveData();
     selectedTo = '__ALL__';
     selectedHousehold = null;
@@ -1926,7 +2298,7 @@ async function approveDraft(uid){
     if(!confirm(`Duyệt ${draftList.length} người vào danh sách chính?`)) return;
     const mainSnap = await firebase.database().ref('sharedData/members').once('value');
     const mainList = mainSnap.exists() ? mainSnap.val() : [];
-    const merged = ensureToField(mainList.concat(draftList));
+    const merged = dedupeHeads(ensureToField(mainList.concat(draftList)));
     await firebase.database().ref('sharedData/members').set(merged);
     await firebase.database().ref('sharedData/drafts/' + uid).remove();
     await firebase.database().ref('sharedData/draftStatus/' + uid).remove();
@@ -2112,7 +2484,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
           <thead><tr><th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Dân tộc</th><th>Tôn giáo</th><th>Địa chỉ</th><th>Ghi chú</th></tr></thead>
           <tbody>
             ${g.members.map(m=>`<tr>
-              <td>${escapeHtml(m.name||'')}</td>
+              <td>${escapeHtml(m.name||'')}${m.isHead ? ' (Chủ hộ)' : ''}</td>
               <td>${escapeHtml(m.cccd||'')}</td>
               <td>${escapeHtml(m.year||'')}</td>
               <td>${escapeHtml(m.ethnicity||'')}</td>
@@ -2191,6 +2563,15 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   setInterval(refreshStatusPill, 700);
   refreshStatusPill();
 
+  /* ---------- Quay lại kết quả tìm kiếm (nút trên trang + nút Back của điện thoại) ---------- */
+  document.getElementById('backToSearchBtn').addEventListener('click', function(){
+    if(history.state && history.state.hhView){ history.back(); }   // popstate sẽ khôi phục kết quả
+    else{ restoreSearchReturn(); }
+  });
+  window.addEventListener('popstate', function(){
+    if(searchReturn) restoreSearchReturn();
+  });
+
   /* ---------- Thẻ thống kê + hiện nút "In hộ này" (được render() của script gốc gọi) ---------- */
   window.updateDashboardExtras = function(){
     try{
@@ -2202,6 +2583,14 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
       var searching = document.getElementById('searchInput').value.trim() || document.getElementById('searchYearInput').value.trim();
       var oneHousehold = !searching && selectedHousehold && selectedHousehold !== '__ALL__' && groups[selectedHousehold];
       document.getElementById('printHouseholdBtn').style.display = oneHousehold ? '' : 'none';
+
+      var backBtn = document.getElementById('backToSearchBtn');
+      if(!searching && searchReturn){
+        backBtn.style.display = '';
+        document.getElementById('backToSearchLabel').textContent = 'Quay lại kết quả: ' + (searchReturn.label || 'tìm kiếm');
+      }else{
+        backBtn.style.display = 'none';
+      }
     }catch(err){ console.error(err); }
   };
 
@@ -2217,7 +2606,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
       '<table><thead><tr><th>STT</th><th>Họ và tên</th><th>Số CCCD</th><th>Ngày sinh</th><th>Dân tộc</th><th>Tôn giáo</th><th>Địa chỉ</th><th>Ghi chú</th></tr></thead><tbody>' +
       g.members.map(function(m, i){
         return '<tr><td>' + (i+1) + '</td>' +
-          '<td>' + escapeHtml(m.name||'') + '</td>' +
+          '<td>' + escapeHtml(m.name||'') + (m.isHead ? ' (Chủ hộ)' : '') + '</td>' +
           '<td>' + escapeHtml(m.cccd||'') + '</td>' +
           '<td>' + escapeHtml(m.year||'') + '</td>' +
           '<td>' + escapeHtml(m.ethnicity||'') + '</td>' +
