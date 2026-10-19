@@ -378,13 +378,15 @@ button{cursor:pointer;}
    ========================================================= */
 .overlay{
   display:none;position:fixed;inset:0;background:rgba(4,36,31,.58);
-  align-items:center;justify-content:center;z-index:80;padding:16px;overflow-y:auto;
+  align-items:flex-start;justify-content:center;z-index:80;padding:16px;overflow-y:auto;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
 }
+.overlay > .form-card{margin:auto;}  /* căn giữa khi vừa màn hình, tự cuộn từ trên xuống khi dài (bàn phím điện thoại) */
 .overlay.show{display:flex;animation:fade-in .16s var(--ease);}
 @keyframes fade-in{from{opacity:0;}to{opacity:1;}}
 .form-card{
   background:#fff;border-radius:var(--radius-card);padding:26px;width:100%;max-width:440px;
-  max-height:calc(100vh - 32px);overflow-y:auto;
+  max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;
   border:1px solid var(--line);border-top:5px solid var(--sun);box-shadow:var(--shadow-lg);
   animation:card-in .22s var(--ease);
 }
@@ -526,6 +528,68 @@ body.locked #mainApp{display:none;}
   .stat-value{font-size:20px;}
   .hero-title{font-size:28px;}
 }
+
+
+/* ===== Nút ✕ đóng cửa sổ (luôn thấy được trên điện thoại) ===== */
+.modal-x{
+  position:sticky;top:0;float:right;z-index:3;margin:-10px -8px 0 10px;
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#fff;
+  color:var(--ink-soft);font-size:24px;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(10,74,64,.12);
+}
+.modal-x:hover{background:var(--paper);color:var(--teal-deep);}
+
+/* ===== Rà soát & thống kê ===== */
+#auditBtn{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11l3 3L22 4'/%3E%3Cpath d='M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11'/%3E%3C/svg%3E");}
+.audit-card{max-width:800px;}
+.audit-card h3{margin-bottom:4px;}
+.audit-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;}
+.audit-tabs{display:flex;gap:4px;background:var(--paper);padding:4px;border-radius:12px;margin-bottom:14px;}
+.audit-tab{flex:1;border:none;background:none;padding:8px 6px;border-radius:9px;font-weight:600;font-size:13px;color:var(--ink-soft);min-height:40px;}
+.audit-tab.on{background:#fff;color:var(--teal-deep);box-shadow:0 1px 4px rgba(10,74,64,.15);}
+.audit-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.audit-chip{font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 12px;background:var(--paper);color:var(--ink);}
+.audit-chip.err{background:#FBE6E2;color:#9B2C1F;}
+.audit-chip.warn{background:var(--sun-soft);color:#7A5410;}
+.audit-chip.info{background:#E3F0EC;color:var(--teal-deep);}
+.audit-ok{padding:26px 12px;text-align:center;color:var(--teal-deep);font-weight:600;background:#EEF6F3;border-radius:14px;}
+.audit-cat{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;overflow:hidden;}
+.audit-cat > summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;min-height:44px;}
+.audit-cat > summary::-webkit-details-marker{display:none;}
+.audit-cat > summary .n{margin-left:auto;font-size:12px;border-radius:999px;padding:2px 10px;background:var(--paper);}
+.audit-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--teal);}
+.audit-dot.err{background:#C0392B;} .audit-dot.warn{background:var(--sun);}
+.audit-hint{font-size:12.5px;color:var(--ink-soft);padding:0 14px 8px;line-height:1.55;}
+.audit-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap;}
+.audit-who{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.audit-who b{font-size:14px;color:var(--ink);}
+.audit-who span{font-size:12px;color:var(--teal-deep);font-weight:600;}
+.audit-who em{font-size:12.5px;color:var(--ink-soft);font-style:normal;}
+.audit-acts{display:flex;gap:6px;}
+.audit-more{padding:8px 14px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);}
+.audit-year{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.audit-year button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-weight:600;font-size:13px;min-height:36px;}
+.audit-year button.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+.audit-note{font-size:12px;color:var(--ink-soft);line-height:1.55;margin:10px 0 0;}
+.stat-block{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff;}
+.stat-block h4{margin:0 0 8px;font-size:13.5px;color:var(--teal-deep);}
+.stat-line{display:grid;grid-template-columns:minmax(90px,150px) 1fr 44px;gap:10px;align-items:center;font-size:13px;padding:3px 0;}
+.stat-line .bar{height:9px;border-radius:5px;background:var(--paper-2);overflow:hidden;}
+.stat-line .bar i{display:block;height:100%;background:var(--teal);border-radius:5px;}
+.stat-line b{text-align:right;}
+.stat-big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.stat-big div{background:var(--paper);border-radius:12px;padding:10px;text-align:center;}
+.stat-big b{display:block;font-family:var(--font-serif);font-size:22px;color:var(--teal-deep);}
+.stat-big span{font-size:11.5px;color:var(--ink-soft);}
+@keyframes row-flash{0%,60%{background:var(--sun-soft);}100%{background:transparent;}}
+.record-row.flash{animation:row-flash 2.2s ease-out;}
+
+/* ===== Điện thoại: chống tự phóng to khi chạm ô nhập (iPhone) + màn hình khóa cuộn được khi hiện bàn phím ===== */
+@media (max-width:860px){
+  input,select,textarea{font-size:16px !important;}
+}
+#lockScreen{overflow-y:auto;align-items:flex-start;height:100vh;height:100dvh;}
+#lockScreen .lock-card{margin:auto;}
 
 /* =========================================================
    PRINT (giữ nguyên định dạng in gốc)
@@ -698,6 +762,7 @@ body.locked #mainApp{display:none;}
             <span class="label-text">Công cụ</span>
           </summary>
           <div class="tools-menu-list">
+            <button class="tools-menu-item" id="auditBtn">Rà soát &amp; thống kê</button>
             <button class="tools-menu-item" id="printBtn">In tất cả</button>
             <button class="tools-menu-item" id="viewOnlyBtn">Tạo bản chỉ xem</button>
             <button class="tools-menu-item" id="exportBtn">Lưu vào máy</button>
@@ -855,8 +920,27 @@ body.locked #mainApp{display:none;}
   </div>
 </div>
 
+<div class="overlay" id="auditOverlay" role="dialog" aria-modal="true" aria-labelledby="auditTitle">
+  <div class="form-card audit-card">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
+    <h3 id="auditTitle">Rà soát &amp; thống kê Ấp Thứ Ba</h3>
+    <p class="audit-sub" id="auditSub"></p>
+    <div class="audit-tabs" role="tablist">
+      <button class="audit-tab on" data-tab="check" type="button">Kiểm tra dữ liệu</button>
+      <button class="audit-tab" data-tab="age" type="button">Mốc tuổi cần nhớ</button>
+      <button class="audit-tab" data-tab="stats" type="button">Thống kê</button>
+    </div>
+    <div id="auditBody"></div>
+    <div class="form-actions">
+      <button class="btn secondary" id="printAuditBtn" type="button">In danh sách này</button>
+      <button class="btn secondary" id="closeAuditBtn" type="button">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="syncOverlay" role="dialog" aria-modal="true">
   <div class="form-card" style="max-width:600px;">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
     <h3>
       <svg class="icon" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
       Đồng bộ máy tính &amp; điện thoại
@@ -880,6 +964,7 @@ body.locked #mainApp{display:none;}
 
 <div class="overlay" id="exportOverlay" role="dialog" aria-modal="true">
   <div class="form-card" style="max-width:560px;">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
     <h3>Xuất dữ liệu</h3>
     <p class="modal-desc">Bấm "Sao chép" rồi dán vào Ghi chú, Zalo, Email... để lưu lại. Lần sau muốn khôi phục, dán đoạn này vào ô "Nhập file".</p>
     <textarea class="data-textarea" id="exportText" readonly></textarea>
@@ -893,6 +978,7 @@ body.locked #mainApp{display:none;}
 
 <div class="overlay" id="pendingOverlay" role="dialog" aria-modal="true">
   <div class="form-card" style="max-width:900px;">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
     <h3>
       <svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
       Nháp đang chờ duyệt
@@ -907,6 +993,7 @@ body.locked #mainApp{display:none;}
 
 <div class="overlay" id="importOverlay" role="dialog" aria-modal="true">
   <div class="form-card" style="max-width:560px;">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
     <h3>Nhập dữ liệu</h3>
     <p class="modal-desc">Dán đoạn dữ liệu đã sao chép trước đó vào ô dưới đây.</p>
     <textarea class="data-textarea" id="importText" placeholder="Dán dữ liệu vào đây..."></textarea>
@@ -1126,8 +1213,18 @@ function attachCloudListener(){
     applyingCloud = true;
     members = ensureToField(cloudMembers);
     if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-    if(members.length > 0) selectedHousehold='__ALL__'; else selectedHousehold=null;
+    // Mỗi lần lưu, Firebase dội dữ liệu về đây. Bản gốc luôn ép về "Tất cả các hộ" nên đang xem
+    // một hộ / vừa ghim chủ hộ là bị văng ra. Nay chỉ về "Tất cả" khi chưa chọn gì hoặc hộ đang xem không còn.
+    if(members.length > 0){
+      const keepHh = selectedHousehold && (selectedHousehold === '__ALL__' || groupByHousehold(members)[selectedHousehold]);
+      if(!keepHh) selectedHousehold = '__ALL__';
+      if(selectedTo !== '__ALL__' && !members.some(m => (m.to || '(chưa có tổ)') === selectedTo)){ selectedTo = '__ALL__'; selectedHousehold = '__ALL__'; }
+    }else{
+      selectedHousehold = null;
+    }
+    const keepY = window.scrollY;
     render();
+    window.scrollTo(0, keepY);
     applyingCloud = false;
     setSyncStatus('☁️ Đã đồng bộ dữ liệu mới nhất', true);
   };
@@ -1476,8 +1573,10 @@ async function changeHead(id){
     delete cur.isHead;
     target.isHead = true;
   }
-  await saveData();
+  const keepY = window.scrollY;
   render();
+  window.scrollTo(0, keepY);
+  await saveData();
 }
 async function toggleHead(id){
   if(!canEditCurrentMode()){ alert('Bạn không có quyền sửa danh sách chính.'); return; }
@@ -1490,8 +1589,10 @@ async function toggleHead(id){
     members.forEach(x=>{ if(x !== m && sameHousehold(x, m)) delete x.isHead; });
     m.isHead = true;
   }
+  const keepY = window.scrollY;
+  render();                       // cập nhật ngay, không chờ mạng -> không bấm đúp nhầm
+  window.scrollTo(0, keepY);      // giữ nguyên vị trí đang xem (kể cả trong kết quả tìm kiếm)
   await saveData();
-  render();
 }
 
 function renderMain(){
@@ -2152,7 +2253,7 @@ async function restoreBackupFromComputer(){
     if(!Array.isArray(data)) throw new Error('sai định dạng');
     const ok = confirm(`File có ${data.length} thành viên.\n\nBấm OK để THAY THẾ toàn bộ dữ liệu hiện tại bằng file này.\nBấm Hủy để không khôi phục.`);
     if(!ok) return;
-    members = ensureToField(data);
+    members = dedupeHeads(ensureToField(data));
     await saveData();
     selectedTo = '__ALL__';
     selectedHousehold = '__ALL__';
@@ -2569,6 +2670,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     else{ restoreSearchReturn(); }
   });
   window.addEventListener('popstate', function(){
+    if(window.layerHandlesPop && window.layerHandlesPop()) return;   // nút Back đang dùng để đóng cửa sổ/menu
     if(searchReturn) restoreSearchReturn();
   });
 
@@ -2630,6 +2732,347 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     if(selectedHousehold && selectedHousehold !== '__ALL__') printHousehold(selectedHousehold);
   });
 
+})();
+</script>
+
+<script>
+/* =========================================================================
+   (1) NÚT BACK CỦA ĐIỆN THOẠI: đóng cửa sổ đang mở / ngăn kéo danh sách hộ
+       thay vì thoát khỏi trang. Mỗi cửa sổ mở ra tạo 1 mục lịch sử; Back = đóng cửa sổ trên cùng.
+   (2) Bấm nền tối ngoài cửa sổ = đóng; nút ✕ luôn nằm trên cùng cửa sổ.
+   ========================================================================= */
+(function(){
+  var CLOSE_BTN = { overlay:'cancelBtn', syncOverlay:'closeSyncBtn', exportOverlay:'closeExportBtn',
+                    pendingOverlay:'closePendingBtn', importOverlay:'closeImportBtn', auditOverlay:'closeAuditBtn' };
+  var stack = [];
+  var ignore = 0;
+
+  function closeLayer(id){
+    if(id === 'choiceOverlay'){ window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape', bubbles:true})); return; }
+    if(id === '__sidebar'){ document.getElementById('sidebarOverlay').click(); return; }
+    var b = document.getElementById(CLOSE_BTN[id]);
+    if(b) b.click(); else document.getElementById(id).classList.remove('show');
+  }
+  window.closeLayer = closeLayer;
+
+  function onChange(id, open){
+    var i = stack.indexOf(id);
+    if(open && i < 0){
+      stack.push(id);
+      try{ history.pushState({layer:id}, ''); }catch(e){}
+    }else if(!open && i >= 0){
+      var wasTop = (i === stack.length - 1);
+      stack.splice(i, 1);
+      if(wasTop){ ignore++; try{ history.back(); }catch(e){ ignore--; } }
+    }
+  }
+  function watch(id, cls){
+    var el = document.getElementById(id);
+    if(!el) return;
+    new MutationObserver(function(){ onChange(id === 'sidebar' ? '__sidebar' : id, el.classList.contains(cls)); })
+      .observe(el, {attributes:true, attributeFilter:['class']});
+  }
+  Object.keys(CLOSE_BTN).concat(['choiceOverlay']).forEach(function(id){ watch(id, 'show'); });
+  watch('sidebar', 'mobile-open');
+
+  window.layerHandlesPop = function(){
+    if(ignore > 0){ ignore--; return true; }
+    if(stack.length){ var id = stack.pop(); closeLayer(id); return true; }
+    return false;
+  };
+
+  document.querySelectorAll('.modal-x').forEach(function(b){
+    b.addEventListener('click', function(){ closeLayer(b.closest('.overlay').id); });
+  });
+  ['syncOverlay','exportOverlay','pendingOverlay','importOverlay','auditOverlay'].forEach(function(id){
+    var el = document.getElementById(id);
+    el.addEventListener('mousedown', function(e){ if(e.target === el) closeLayer(id); });
+  });
+})();
+</script>
+
+<script>
+/* =========================================================================
+   RÀ SOÁT & THỐNG KÊ (mục mới trong menu Công cụ) — chỉ ĐỌC dữ liệu đang mở,
+   không tự sửa gì. Bấm "Xem hộ" / "Sửa" để nhảy tới đúng chỗ cần xử lý.
+   ========================================================================= */
+(function(){
+  var overlayEl = document.getElementById('auditOverlay');
+  var bodyEl = document.getElementById('auditBody');
+  var tab = 'check';
+  var ageYear = new Date().getFullYear();
+  var printData = null;
+  var LIMIT = 150;
+
+  function norm(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+  function keyOf(m){ return (m.to||'(chưa có tổ)') + '||' + (m.household||'(chưa có số hộ)'); }
+  function place(m){ return 'Tổ ' + (m.to||'?') + ' · Hộ ' + (m.household||'?'); }
+  function parseBirth(m){
+    var s = String(m.year||'').trim();
+    var d = s.match(/(\d{1,2})\D+(\d{1,2})\D+(\d{4})\s*$/);
+    if(d) return {d:+d[1], m:+d[2], y:+d[3], full:true};
+    var y = s.match(/(\d{4})\s*$/);
+    return y ? {y:+y[1], full:false} : null;
+  }
+  function pad(n){ return (n<10?'0':'') + n; }
+  function ageNow(b){
+    var now = new Date(), a = now.getFullYear() - b.y;
+    if(b.full && ((now.getMonth()+1) < b.m || ((now.getMonth()+1) === b.m && now.getDate() < b.d))) a--;
+    return a;
+  }
+  function cccdYear(c){ var g = +c.charAt(3); return (1900 + Math.floor(g/2)*100) + (+c.slice(4,6)); }
+  function cccdGender(c){ return (+c.charAt(3)) % 2 === 0 ? 'Nam' : 'Nữ'; }
+  function cleanCccd(m){ return String(m.cccd||'').replace(/\s/g,''); }
+
+  /* ---------- 1. KIỂM TRA DỮ LIỆU ---------- */
+  var CATS = [
+    {id:'noname',   sev:'err',  title:'Thiếu họ tên'},
+    {id:'nohh',     sev:'err',  title:'Thiếu Tổ hoặc Số hộ'},
+    {id:'dupcccd',  sev:'err',  title:'Trùng số CCCD', hint:'Hai người không thể có cùng một số CCCD — thường do nhập nhầm hoặc nhập hai lần.'},
+    {id:'badcccd',  sev:'err',  title:'CCCD sai định dạng', hint:'CCCD gồm đúng 12 chữ số, không có chữ hay ký tự lạ.'},
+    {id:'badyear',  sev:'err',  title:'Thiếu hoặc sai ngày/năm sinh'},
+    {id:'multihead',sev:'err',  title:'Hộ có hơn 1 chủ hộ'},
+    {id:'mismatch', sev:'warn', title:'CCCD không khớp năm sinh', hint:'Trong số CCCD 12 số, vị trí 5–6 là 2 số cuối của năm sinh. Lệch thường là gõ nhầm số hoặc nhầm năm.'},
+    {id:'dupperson',sev:'warn', title:'Có thể nhập trùng người', hint:'Cùng họ tên và cùng năm sinh. Nếu thật sự là hai người khác nhau thì bỏ qua.'},
+    {id:'nocccd',   sev:'warn', title:'Đủ 14 tuổi nhưng chưa có CCCD'},
+    {id:'oldcmnd',  sev:'warn', title:'Còn dùng CMND 9 số', hint:'Nên nhắc người dân đổi sang thẻ CCCD/căn cước.'},
+    {id:'younghead',sev:'warn', title:'Chủ hộ dưới 18 tuổi'},
+    {id:'nohead',   sev:'info', title:'Hộ chưa ghim chủ hộ', hint:'Ghim chủ hộ giúp đổi Tổ/Số hộ hàng loạt cho cả hộ.'}
+  ];
+
+  function computeIssues(){
+    var out = {}; CATS.forEach(function(c){ out[c.id] = []; });
+    var byCccd = {}, byPerson = {}, byHh = {}, nowY = new Date().getFullYear();
+    members.forEach(function(m){
+      var c = cleanCccd(m), b = parseBirth(m);
+      if(c) (byCccd[c] = byCccd[c] || []).push(m);
+      if(norm(m.name) && b) (byPerson[norm(m.name) + '|' + b.y] = byPerson[norm(m.name) + '|' + b.y] || []).push(m);
+      if(m.to && m.household) (byHh[keyOf(m)] = byHh[keyOf(m)] || []).push(m);
+    });
+    members.forEach(function(m){
+      var c = cleanCccd(m), b = parseBirth(m), age = b ? ageNow(b) : null;
+      if(!norm(m.name)) out.noname.push({m:m, text:'Chưa có họ tên'});
+      if(!m.to || !m.household) out.nohh.push({m:m, text:(!m.to ? 'Thiếu Tổ' : '') + (!m.to && !m.household ? ' và ' : '') + (!m.household ? 'Thiếu Số hộ' : '')});
+      if(!b) out.badyear.push({m:m, text:'Chưa có ngày/năm sinh'});
+      else if(b.y < 1900 || b.y > nowY) out.badyear.push({m:m, text:'Năm sinh bất thường: ' + b.y});
+      else if(b.full && (b.m < 1 || b.m > 12 || b.d < 1 || b.d > 31)) out.badyear.push({m:m, text:'Ngày/tháng sinh không hợp lệ: ' + m.year});
+      if(c){
+        if(/^\d{12}$/.test(c)){
+          if(b && cccdYear(c) !== b.y) out.mismatch.push({m:m, text:'CCCD cho thấy sinh năm ' + cccdYear(c) + ', sổ ghi ' + b.y});
+        }else if(/^\d{9}$/.test(c)){
+          out.oldcmnd.push({m:m, text:'Số ' + c});
+        }else{
+          out.badcccd.push({m:m, text:'"' + c + '" có ' + c.length + ' ký tự'});
+        }
+      }else if(age !== null && age >= 14){
+        out.nocccd.push({m:m, text:'Tuổi ' + age + ' — chưa nhập CCCD'});
+      }
+      if(m.isHead && age !== null && age < 18) out.younghead.push({m:m, text:'Chủ hộ ' + age + ' tuổi'});
+    });
+    Object.keys(byCccd).forEach(function(c){
+      var l = byCccd[c]; if(l.length < 2) return;
+      l.forEach(function(m){
+        out.dupcccd.push({m:m, text:'CCCD ' + c + ' trùng với: ' + l.filter(function(x){return x!==m;}).map(function(x){return (x.name||'?') + ' (' + place(x) + ')';}).join('; ')});
+      });
+    });
+    Object.keys(byPerson).forEach(function(k){
+      var l = byPerson[k]; if(l.length < 2) return;
+      var cs = l.map(cleanCccd);
+      if(cs[0] && cs.every(function(x){return x === cs[0];})) return; // đã báo ở "Trùng CCCD"
+      l.forEach(function(m){
+        out.dupperson.push({m:m, text:'Giống: ' + l.filter(function(x){return x!==m;}).map(function(x){return place(x) + (x.cccd ? ' · CCCD ' + x.cccd : '');}).join('; ')});
+      });
+    });
+    Object.keys(byHh).forEach(function(k){
+      var l = byHh[k], heads = l.filter(function(m){return m.isHead;});
+      if(heads.length > 1) out.multihead.push({m:heads[1], text:heads.length + ' chủ hộ: ' + heads.map(function(h){return h.name||'?';}).join(', ')});
+      if(heads.length === 0) out.nohead.push({m:l[0], text:l.length + ' người, chưa ghim chủ hộ', hhOnly:true});
+    });
+    return out;
+  }
+
+  function actButtons(m, hhOnly){
+    var s = '<button class="btn secondary small" type="button" data-act="view" data-key="' + escapeAttr(keyOf(m)) + '" data-id="' + escapeAttr(m.id) + '">Xem hộ</button>';
+    if(!hhOnly && canEditCurrentMode()) s += '<button class="btn secondary small" type="button" data-act="edit" data-id="' + escapeAttr(m.id) + '">Sửa</button>';
+    return s;
+  }
+
+  function renderCheck(){
+    var res = computeIssues(), cnt = {err:0, warn:0, info:0}, pd = {title:'Kết quả kiểm tra dữ liệu', sections:[]};
+    CATS.forEach(function(c){ cnt[c.sev] += res[c.id].length; });
+    var html = '<div class="audit-chips">' +
+      '<span class="audit-chip err">' + cnt.err + ' lỗi cần sửa</span>' +
+      '<span class="audit-chip warn">' + cnt.warn + ' cần xem lại</span>' +
+      '<span class="audit-chip info">' + cnt.info + ' gợi ý</span></div>';
+    if(!members.length){
+      html = '<div class="audit-ok">Chưa có dữ liệu để kiểm tra.</div>';
+    }else if(cnt.err + cnt.warn + cnt.info === 0){
+      html += '<div class="audit-ok">Dữ liệu sạch, không phát hiện vấn đề nào.</div>';
+    }
+    CATS.forEach(function(c){
+      var items = res[c.id]; if(!items.length) return;
+      html += '<details class="audit-cat"' + (c.sev === 'err' ? ' open' : '') + '><summary><span class="audit-dot ' + c.sev + '"></span>' + escapeHtml(c.title) + '<span class="n">' + items.length + '</span></summary>';
+      if(c.hint) html += '<div class="audit-hint">' + escapeHtml(c.hint) + '</div>';
+      items.slice(0, LIMIT).forEach(function(it){
+        var m = it.m;
+        html += '<div class="audit-row"><div class="audit-who"><b>' + escapeHtml(it.hhOnly ? ('Hộ ' + (m.household||'?')) : (m.name || '(chưa có tên)')) + '</b><span>' + escapeHtml(place(m)) + '</span><em>' + escapeHtml(it.text) + '</em></div><div class="audit-acts">' + actButtons(m, it.hhOnly) + '</div></div>';
+      });
+      if(items.length > LIMIT) html += '<div class="audit-more">…và ' + (items.length - LIMIT) + ' mục nữa (hãy xử lý các mục trên trước).</div>';
+      html += '</details>';
+      pd.sections.push({cap:c.title + ' (' + items.length + ')', head:['Họ tên','Tổ','Hộ','Nội dung'], rows:items.map(function(it){return [it.hhOnly ? '' : (it.m.name||''), it.m.to||'', it.m.household||'', it.text];})});
+    });
+    printData = pd;
+    return html;
+  }
+
+  /* ---------- 2. MỐC TUỔI ---------- */
+  var MILESTONES = [
+    {age:6,   title:'Đủ 6 tuổi — vào lớp 1'},
+    {age:14,  title:'Đủ 14 tuổi — làm thẻ CCCD/căn cước lần đầu'},
+    {age:17,  title:'Đủ 17 tuổi — đăng ký nghĩa vụ quân sự (nam)', maleOnly:true},
+    {age:18,  title:'Đủ 18 tuổi — đủ tuổi đi bầu cử'},
+    {age:25,  title:'Đủ 25 tuổi — mốc đổi thẻ CCCD/căn cước'},
+    {age:40,  title:'Đủ 40 tuổi — mốc đổi thẻ CCCD/căn cước'},
+    {age:60,  title:'Đủ 60 tuổi — mốc đổi thẻ, bước vào tuổi người cao tuổi'},
+    {age:70,  title:'Đủ 70 tuổi — mốc mừng thọ'},
+    {age:80,  title:'Đủ 80 tuổi — mốc mừng thọ'},
+    {age:90,  title:'Đủ 90 tuổi — mốc mừng thọ'},
+    {age:100, title:'Đủ 100 tuổi — mốc mừng thọ'}
+  ];
+
+  function renderAge(){
+    var cur = new Date().getFullYear(), pd = {title:'Mốc tuổi năm ' + ageYear, sections:[]};
+    var html = '<div class="audit-year"><span style="font-size:13px;color:var(--ink-soft);">Xem năm:</span>' +
+      [cur, cur+1, cur+2].map(function(y){ return '<button type="button" data-year="' + y + '" class="' + (y === ageYear ? 'on' : '') + '">' + y + '</button>'; }).join('') + '</div>';
+    var total = 0, blocks = '';
+    MILESTONES.forEach(function(ms){
+      var list = [];
+      members.forEach(function(m){
+        var b = parseBirth(m); if(!b || b.y !== ageYear - ms.age) return;
+        if(ms.maleOnly){ var c = cleanCccd(m); if(/^\d{12}$/.test(c) && cccdGender(c) === 'Nữ') return; }
+        list.push({m:m, b:b});
+      });
+      if(!list.length) return;
+      list.sort(function(a,b){ return ((a.b.m||0)*100 + (a.b.d||0)) - ((b.b.m||0)*100 + (b.b.d||0)); });
+      total += list.length;
+      blocks += '<details class="audit-cat" open><summary><span class="audit-dot"></span>' + escapeHtml(ms.title) + '<span class="n">' + list.length + '</span></summary>';
+      list.forEach(function(it){
+        var when = it.b.full ? ('ngày ' + pad(it.b.d) + '/' + pad(it.b.m) + '/' + ageYear) : ('trong năm ' + ageYear);
+        blocks += '<div class="audit-row"><div class="audit-who"><b>' + escapeHtml(it.m.name || '(chưa có tên)') + '</b><span>' + escapeHtml(place(it.m)) + '</span><em>Sinh ' + escapeHtml(it.m.year || '') + ' · đủ ' + ms.age + ' tuổi ' + when + '</em></div><div class="audit-acts">' + actButtons(it.m, true) + '</div></div>';
+      });
+      blocks += '</details>';
+      pd.sections.push({cap:ms.title + ' (' + list.length + ')', head:['Họ tên','Tổ','Hộ','Ngày sinh','Đủ tuổi vào'], rows:list.map(function(it){return [it.m.name||'', it.m.to||'', it.m.household||'', it.m.year||'', it.b.full ? pad(it.b.d)+'/'+pad(it.b.m)+'/'+ageYear : 'năm '+ageYear];})});
+    });
+    html += '<div class="audit-chips"><span class="audit-chip info">' + total + ' lượt cần theo dõi trong năm ' + ageYear + '</span></div>';
+    html += total ? blocks : '<div class="audit-ok">Năm ' + ageYear + ' không có ai tới các mốc này.</div>';
+    html += '<p class="audit-note">Tuổi tính theo năm sinh (tuổi = năm đang xem − năm sinh). Các mốc là mốc thường gặp ở cấp tổ/ấp — hãy đối chiếu quy định hiện hành khi thực hiện thủ tục.</p>';
+    printData = pd;
+    return html;
+  }
+
+  /* ---------- 3. THỐNG KÊ ---------- */
+  function barBlock(title, rows, total){
+    if(!rows.length) return '';
+    var h = '<div class="stat-block"><h4>' + escapeHtml(title) + '</h4>';
+    rows.forEach(function(r){
+      h += '<div class="stat-line"><span>' + escapeHtml(r[0]) + '</span><div class="bar"><i style="width:' + (total ? Math.round(r[1]*100/total) : 0) + '%"></i></div><b>' + r[1] + '</b></div>';
+    });
+    return h + '</div>';
+  }
+  function tally(fn){
+    var t = {}; members.forEach(function(m){ var k = fn(m); t[k] = (t[k]||0) + 1; });
+    return Object.keys(t).map(function(k){ return [k, t[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+  }
+  function renderStats(){
+    var n = members.length, pd = {title:'Thống kê Ấp Thứ Ba', sections:[]};
+    if(!n) return '<div class="audit-ok">Chưa có dữ liệu để thống kê.</div>';
+    var groups = groupByHousehold(members), hhCount = Object.keys(groups).length;
+    var heads = Object.keys(groups).filter(function(k){ return groups[k].members.some(function(m){return m.isHead;}); }).length;
+    var html = '<div class="stat-big"><div><b>' + hhCount + '</b><span>hộ</span></div><div><b>' + n + '</b><span>nhân khẩu</span></div><div><b>' + heads + '/' + hhCount + '</b><span>hộ đã ghim chủ hộ</span></div></div>';
+
+    var ageBuckets = [['0 – 5 tuổi',0,5],['6 – 14 tuổi',6,14],['15 – 17 tuổi',15,17],['18 – 59 tuổi',18,59],['60 tuổi trở lên',60,200]];
+    var ageRows = ageBuckets.map(function(b){ return [b[0], 0]; }), unk = 0, male = 0, female = 0, gunk = 0, voters = 0;
+    members.forEach(function(m){
+      var bd = parseBirth(m), c = cleanCccd(m);
+      if(/^\d{12}$/.test(c)){ if(cccdGender(c) === 'Nam') male++; else female++; } else gunk++;
+      if(!bd){ unk++; return; }
+      var a = ageNow(bd);
+      if(a >= 18) voters++;
+      for(var i = 0; i < ageBuckets.length; i++){ if(a >= ageBuckets[i][1] && a <= ageBuckets[i][2]){ ageRows[i][1]++; break; } }
+    });
+    if(unk) ageRows.push(['Chưa rõ tuổi', unk]);
+    var genderRows = [['Nam', male], ['Nữ', female]]; if(gunk) genderRows.push(['Chưa rõ (chưa có CCCD)', gunk]);
+    var toRows = {};
+    Object.keys(groups).forEach(function(k){ var g = groups[k]; toRows[g.to] = toRows[g.to] || {hh:0, p:0}; toRows[g.to].hh++; toRows[g.to].p += g.members.length; });
+    var toList = Object.keys(toRows).sort(function(a,b){ var x = parseFloat(a), y = parseFloat(b); return (!isNaN(x) && !isNaN(y)) ? x-y : String(a).localeCompare(String(b)); })
+      .map(function(t){ return ['Tổ ' + t + ' (' + toRows[t].hh + ' hộ)', toRows[t].p]; });
+    var ethRows = tally(function(m){ return norm(m.ethnicity) ? m.ethnicity.trim() : 'Chưa ghi'; }).slice(0, 8);
+    var relRows = tally(function(m){ return norm(m.religion) ? m.religion.trim() : 'Chưa ghi'; }).slice(0, 8);
+
+    html += '<div class="audit-chips"><span class="audit-chip info">' + voters + ' người đủ 18 tuổi trở lên (đủ tuổi bầu cử)</span></div>';
+    html += barBlock('Theo nhóm tuổi', ageRows, n) + barBlock('Theo giới tính (suy ra từ số CCCD)', genderRows, n) + barBlock('Theo Tổ — số nhân khẩu', toList, n) + barBlock('Theo dân tộc', ethRows, n) + barBlock('Theo tôn giáo', relRows, n);
+    [['Nhóm tuổi', ageRows], ['Giới tính', genderRows], ['Theo Tổ', toList], ['Dân tộc', ethRows], ['Tôn giáo', relRows]].forEach(function(s){
+      pd.sections.push({cap:s[0], head:['Mục','Số người'], rows:s[1].map(function(r){return [r[0], String(r[1])];})});
+    });
+    pd.sections.unshift({cap:'Tổng quan', head:['Hộ','Nhân khẩu','Đủ 18 tuổi'], rows:[[String(hhCount), String(n), String(voters)]]});
+    printData = pd;
+    return html;
+  }
+
+  /* ---------- khung chung ---------- */
+  function renderAudit(){
+    document.getElementById('auditSub').textContent = 'Đang xét: ' + (dataMode === 'draft' ? 'Nháp của tôi' : 'Danh sách chính') + ' — ' + members.length + ' nhân khẩu. Chỉ để xem, không tự sửa dữ liệu.';
+    document.querySelectorAll('.audit-tab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-tab') === tab); });
+    bodyEl.innerHTML = tab === 'check' ? renderCheck() : (tab === 'age' ? renderAge() : renderStats());
+  }
+  window.renderAudit = renderAudit;
+
+  document.getElementById('auditBtn').addEventListener('click', function(){
+    overlayEl.classList.add('show');
+    renderAudit();
+    overlayEl.scrollTop = 0;
+  });
+  document.getElementById('closeAuditBtn').addEventListener('click', function(){ overlayEl.classList.remove('show'); });
+  document.querySelectorAll('.audit-tab').forEach(function(b){
+    b.addEventListener('click', function(){ tab = b.getAttribute('data-tab'); renderAudit(); });
+  });
+
+  bodyEl.addEventListener('click', function(e){
+    var y = e.target.closest('[data-year]');
+    if(y){ ageYear = +y.getAttribute('data-year'); renderAudit(); return; }
+    var btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    var act = btn.getAttribute('data-act'), id = btn.getAttribute('data-id'), key = btn.getAttribute('data-key');
+    var m = members.find(function(x){ return String(x.id) === id; });
+    closeLayer('auditOverlay');
+    // đợi lịch sử trình duyệt đóng xong cửa sổ rồi mới mở màn hình tiếp theo
+    setTimeout(function(){
+      if(act === 'edit' && m){ openMemberForm(m); return; }
+      clearSearchReturn();
+      selectedTo = '__ALL__';
+      selectedHousehold = key;
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchYearInput').value = '';
+      render();
+      window.scrollTo(0, 0);
+      var focusBtn = id ? document.querySelector('.edit-btn[data-id="' + id + '"]') : null;
+      var row = focusBtn ? focusBtn.closest('.record-row') : null;
+      if(row){ row.classList.add('flash'); row.scrollIntoView({block:'center', behavior:'smooth'}); }
+    }, 220);
+  });
+
+  document.getElementById('printAuditBtn').addEventListener('click', function(){
+    if(!printData) return;
+    var today = new Date().toLocaleDateString('vi-VN');
+    var html = '<div class="p-title">Sổ Hộ Khẩu &mdash; Ấp Thứ Ba &mdash; ' + escapeHtml(printData.title) + '</div><div class="p-date">In ngày ' + today + ' &mdash; ' + members.length + ' nhân khẩu</div>';
+    if(!printData.sections.length) html += '<div class="p-household">Không có mục nào.</div>';
+    printData.sections.forEach(function(s){
+      html += '<div class="p-household">' + escapeHtml(s.cap) + '</div><table><thead><tr>' + s.head.map(function(h){return '<th>' + escapeHtml(h) + '</th>';}).join('') + '</tr></thead><tbody>' +
+        s.rows.map(function(r){ return '<tr>' + r.map(function(c){return '<td>' + escapeHtml(c) + '</td>';}).join('') + '</tr>'; }).join('') + '</tbody></table>';
+    });
+    document.getElementById('printArea').innerHTML = html;
+    window.print();
+  });
 })();
 </script>
 </body>
