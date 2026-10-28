@@ -695,6 +695,39 @@ body.locked #mainApp{display:none;}
   .record-tag{grid-column:1 / -1;margin-top:0;justify-self:start;}
 }
 
+
+/* ===== Chuông thông báo + toast + nhật ký hoạt động ===== */
+.bell{position:relative;width:44px;height:44px;border-radius:var(--radius-md);background:#fff;border:1.5px solid var(--line);color:var(--teal-deep);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bell:hover{border-color:var(--teal);background:var(--paper);}
+.bell.ring .icon{animation:bell-ring .9s ease 2;transform-origin:50% 0;}
+@keyframes bell-ring{0%,100%{transform:rotate(0);}15%{transform:rotate(14deg);}30%{transform:rotate(-12deg);}45%{transform:rotate(8deg);}60%{transform:rotate(-6deg);}}
+.bell-badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#C0392B;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+#toastBox{position:fixed;top:14px;right:14px;z-index:300;display:flex;flex-direction:column;gap:10px;width:min(360px,calc(100vw - 28px));pointer-events:none;}
+.toast{pointer-events:auto;display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:14px;padding:12px 14px;box-shadow:0 12px 32px rgba(10,74,64,.28);animation:toast-in .3s var(--ease);cursor:pointer;}
+.toast.warn{border-left-color:var(--sun);} .toast.bad{border-left-color:#C0392B;}
+.toast .t-ico{font-size:20px;line-height:1.2;}
+.toast .t-main{flex:1;min-width:0;font-size:13.5px;line-height:1.45;color:var(--ink);}
+.toast .t-main b{color:var(--teal-deep);}
+.toast .t-time{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.toast .t-x{background:none;border:none;font-size:18px;color:var(--ink-soft);line-height:1;padding:0 2px;min-height:0;}
+.toast.out{animation:toast-out .25s ease forwards;}
+@keyframes toast-in{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes toast-out{to{opacity:0;transform:translateX(30px);}}
+.act-row{display:flex;gap:12px;padding:11px 4px;border-top:1px solid var(--line);align-items:flex-start;}
+.act-row:first-child{border-top:none;}
+.act-ico{width:34px;height:34px;border-radius:10px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.act-main{flex:1;min-width:0;font-size:13.5px;line-height:1.5;}
+.act-main b{color:var(--teal-deep);}
+.act-time{font-size:12px;color:var(--ink-soft);}
+.act-row.new{background:linear-gradient(90deg,var(--sun-soft),transparent 70%);border-radius:10px;}
+.act-row.new .act-time::after{content:" · MỚI";color:#C0392B;font-weight:700;}
+.rule-box{background:var(--paper);border:1px dashed var(--sun);border-radius:12px;padding:14px;font-size:13px;line-height:1.6;}
+.rule-box pre{background:#0E2F2A;color:#CFE6DD;border-radius:10px;padding:12px;font-size:11.5px;overflow:auto;max-height:240px;margin:10px 0;white-space:pre;}
+@media (max-width:860px){
+  .bell{order:-1;margin-left:auto;}
+  #toastBox{top:calc(8px + env(safe-area-inset-top));left:14px;right:14px;width:auto;}
+}
+
 /* =========================================================
    PRINT (giữ nguyên định dạng in gốc)
    ========================================================= */
@@ -854,7 +887,11 @@ body.locked #mainApp{display:none;}
         <input id="searchYearInput" type="text" inputmode="numeric" maxlength="4" placeholder="Đúng năm sinh" aria-label="Tìm đúng năm sinh">
       </div>
 
-      <div class="topbar-right">
+      <button class="bell" id="activityBtn" type="button" style="display:none;" aria-label="Thông báo hoạt động" title="Thông báo hoạt động">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="bell-badge" id="activityBadge" style="display:none;">0</span>
+        </button>
+        <div class="topbar-right">
         <button class="btn secondary" id="syncBtn">
           <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
           <span class="label-text">Đồng bộ</span>
@@ -1047,6 +1084,23 @@ body.locked #mainApp{display:none;}
   </div>
 </div>
 
+<div id="toastBox" aria-live="polite"></div>
+
+<div class="overlay" id="activityOverlay" role="dialog" aria-modal="true" aria-labelledby="activityTitle">
+  <div class="form-card audit-card">
+    <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
+    <h3 id="activityTitle">Hoạt động gần đây</h3>
+    <p class="audit-sub">Ai vừa thêm, sửa, gửi duyệt, đăng nhập… được báo qua máy chủ, máy nào đang mở cũng thấy. Hiện 80 hoạt động gần nhất.</p>
+    <div id="activityStatus" class="audit-sub" style="min-height:18px;"></div>
+    <div id="activityBody"></div>
+    <div class="form-actions">
+      <button class="btn secondary" id="activityTestBtn" type="button">Gửi thông báo thử</button>
+      <button class="btn secondary" id="activityReadBtn" type="button">Đánh dấu đã đọc</button>
+      <button class="btn secondary" id="closeActivityBtn" type="button">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="auditOverlay" role="dialog" aria-modal="true" aria-labelledby="auditTitle">
   <div class="form-card audit-card">
     <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
@@ -1110,7 +1164,7 @@ body.locked #mainApp{display:none;}
       <svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
       Nháp đang chờ duyệt
     </h3>
-    <p class="modal-desc">Xem qua từng nháp của người nhập liệu. Duyệt để gộp vào danh sách chính, hoặc từ chối để xoá nháp đó (họ sẽ phải nhập lại).</p>
+    <p class="modal-desc">Xem qua từng nháp của người nhập liệu. Duyệt để gộp vào danh sách chính, hoặc từ chối kèm lý do — nháp vẫn được giữ lại cho họ tự sửa hoặc xóa.</p>
     <div id="pendingBody">Đang tải...</div>
     <div class="form-actions">
       <button class="btn secondary" id="closePendingBtn">Đóng</button>
@@ -1194,7 +1248,8 @@ async function submitDraftForReview(){
     return;
   }
   try{
-    await statusRef(myUid).set({ submitted: true, submittedAt: Date.now(), count: members.length });
+    await statusRef(myUid).set({ submitted: true, submittedAt: Date.now(), count: members.length, by: actorName() });
+    logActivity('submit', 'gửi duyệt nháp ' + members.length + ' người');
     alert('✅ Đã gửi yêu cầu duyệt! Quản trị viên sẽ xem và gộp vào danh sách chính khi duyệt xong.');
   }catch(err){
     console.error(err);
@@ -1208,6 +1263,91 @@ async function markDraftChangedIfNeeded(){
   if(dataMode === 'draft' && myUid && draftStatusVal && draftStatusVal.submitted){
     try{ await statusRef(myUid).update({ submitted: false }); }catch(e){ console.error(e); }
   }
+}
+
+// ===== NHẬT KÝ HOẠT ĐỘNG (qua máy chủ Firebase) =====
+// Mỗi thao tác (thêm/sửa/xóa, gửi duyệt, duyệt, từ chối, đăng nhập) ghi 1 dòng vào sharedData/activity.
+// Mọi tài khoản đang đăng nhập nghe thay đổi này và hiện thông báo ngay, kèm chuông + nhật ký.
+// Mã riêng của MỖI lần mở trang: để phân biệt 2 máy dùng chung 1 tài khoản (máy tính + điện thoại)
+const SESSION_ID = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+window.SESSION_ID = SESSION_ID;
+let activityBaseline = null;
+let activityRef = null, activityListener = null;
+let loginLogged = false;
+let lastDraftLogAt = 0;
+
+function stableJson(x){ return JSON.stringify(x, Object.keys(x).sort()); }
+function snapMap(list){ const m = new Map(); (list||[]).forEach(x=>m.set(String(x.id), stableJson(x))); return m; }
+function actorName(){
+  const u = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+  const mail = (u && u.email) || (cloudUser && cloudUser.email) || '';
+  return mail ? mail.split('@')[0] : 'Một tài khoản';
+}
+function nameList(arr){
+  const names = arr.slice(0,3).map(m=>m.name||'(chưa tên)').join(', ');
+  return names + (arr.length > 3 ? '…' : '');
+}
+// So danh sách hiện tại với mốc lần trước, trả về câu mô tả (hoặc null nếu không đổi) và đặt lại mốc.
+function describeChanges(){
+  if(!activityBaseline){ activityBaseline = snapMap(members); return null; }
+  const added = [], changed = [], removed = [];
+  const cur = new Set();
+  members.forEach(x=>{
+    const k = String(x.id); cur.add(k);
+    if(!activityBaseline.has(k)) added.push(x);
+    else if(activityBaseline.get(k) !== stableJson(x)) changed.push(x);
+  });
+  activityBaseline.forEach((v,k)=>{ if(!cur.has(k)){ try{ removed.push(JSON.parse(v)); }catch(e){} } });
+  activityBaseline = snapMap(members);
+  const parts = [];
+  if(added.length) parts.push('thêm ' + added.length + ' người (' + nameList(added) + ')');
+  if(changed.length) parts.push('sửa ' + changed.length + ' người (' + nameList(changed) + ')');
+  if(removed.length) parts.push('xóa ' + removed.length + ' người (' + nameList(removed) + ')');
+  if(!parts.length) return null;
+  return (dataMode === 'draft' ? 'cập nhật nháp: ' : 'cập nhật danh sách chính: ') + parts.join('; ');
+}
+async function logActivity(kind, text){
+  try{
+    if(!cloudReady || !myUid || !firebase.database) return;
+    if(kind === 'draft'){            // nháp sửa liên tục: tối đa 1 dòng / 60 giây để khỏi tràn thông báo
+      if(Date.now() - lastDraftLogAt < 60000) return;
+      lastDraftLogAt = Date.now();
+    }
+    await firebase.database().ref('sharedData/activity').push({
+      uid: myUid, sid: SESSION_ID, actor: actorName(), role: myRole || '', kind, text: String(text).slice(0, 400),
+      at: firebase.database.ServerValue.TIMESTAMP
+    });
+    if(window.activityUI) window.activityUI.writeOk();
+    return true;
+  }catch(e){
+    console.warn('Không ghi được nhật ký hoạt động', e);
+    if(window.activityUI) window.activityUI.writeError(e);
+    return false;
+  }
+}
+function logLoginOnce(){
+  if(loginLogged) return;
+  loginLogged = true;
+  logActivity('login', 'vừa đăng nhập (' + (myRole === 'admin' ? 'quản trị' : 'thành viên') + ')');
+}
+function attachActivityListener(){
+  detachActivityListener();
+  if(!myRole) return;
+  activityRef = firebase.database().ref('sharedData/activity').limitToLast(80);
+  activityListener = snap => {
+    const arr = [];
+    snap.forEach(ch => { const v = ch.val(); if(v) arr.push(Object.assign({ id: ch.key }, v)); });
+    if(window.activityUI) window.activityUI.update(arr);
+  };
+  activityRef.on('value', activityListener, err => {
+    console.warn('Không đọc được nhật ký hoạt động', err);
+    if(window.activityUI) window.activityUI.error(err);
+  });
+}
+function detachActivityListener(){
+  if(activityRef && activityListener) activityRef.off('value', activityListener);
+  activityRef = null; activityListener = null;
+  if(window.activityUI) window.activityUI.reset();
 }
 
 function mainRef(){ return firebase.database().ref('sharedData/members'); }
@@ -1239,6 +1379,11 @@ function updateModeUI(){
     if(draftStatusVal && draftStatusVal.submitted){
       const t = new Date(draftStatusVal.submittedAt).toLocaleString('vi-VN');
       banner.innerHTML = `📝 Nháp của tôi — <b style="color:var(--green);">✅ Đã gửi duyệt lúc ${t}</b> (${draftStatusVal.count} người). Đang chờ quản trị viên duyệt.`;
+    }else if(draftStatusVal && draftStatusVal.rejected){
+      const t = draftStatusVal.rejectedAt ? new Date(draftStatusVal.rejectedAt).toLocaleString('vi-VN') : '';
+      banner.innerHTML = `📝 Nháp của tôi — <b style="color:var(--danger);">❌ Chưa được duyệt${t ? ' (' + t + ')' : ''}</b>` +
+        (draftStatusVal.reason ? ` — Lý do: <i>${escapeHtml(draftStatusVal.reason)}</i>.` : '.') +
+        ' Dữ liệu của bạn vẫn còn nguyên ở đây: sửa lại rồi bấm "📤 Gửi duyệt", hoặc tự xóa người nào không cần.';
     }else{
       banner.innerHTML = '📝 Nháp của tôi — chỉ mình bạn thấy khu này. Thêm/sửa xong nhớ bấm "📤 Gửi duyệt" để báo quản trị viên.';
     }
@@ -1303,6 +1448,7 @@ function initFirebase(){
         cloudRef = mainRef();
         attachCloudListener();
         attachNotificationListener(myUid);
+        attachActivityListener();
         attachDraftStatusListener();
         if(myRole === 'admin') attachPendingBadgeListener(); else detachPendingBadgeListener();
         updateModeUI();
@@ -1310,6 +1456,7 @@ function initFirebase(){
           setSyncStatus('⛔ Tài khoản này chưa được cấp quyền. Liên hệ quản trị viên để được thêm vào danh sách editors.', false);
         }else{
           setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ') + ' — vai trò: ' + (myRole==='admin' ? 'Quản trị' : 'Thành viên (nộp nháp)'), true);
+          logLoginOnce();
         }
       }else{
         if(myUid && draftStatusListener){ statusRef(myUid).off('value', draftStatusListener); }
@@ -1320,6 +1467,8 @@ function initFirebase(){
         draftStatusListener = null;
         updateModeUI();
         detachPendingBadgeListener();
+        detachActivityListener();
+        loginLogged = false;
         cloudRef = null;
         cloudReady = false;
         setSyncStatus('Chưa đăng nhập tài khoản đồng bộ.');
@@ -1339,6 +1488,7 @@ function attachCloudListener(){
     if(!Array.isArray(cloudMembers)){ return; }
     applyingCloud = true;
     members = ensureToField(cloudMembers);
+    activityBaseline = snapMap(members);
     if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
     // Mỗi lần lưu, Firebase dội dữ liệu về đây. Bản gốc luôn ép về "Tất cả các hộ" nên đang xem
     // một hộ / vừa ghim chủ hộ là bị văng ra. Nay chỉ về "Tất cả" khi chưa chọn gì hoặc hộ đang xem không còn.
@@ -1475,8 +1625,10 @@ async function loadData(){
 async function saveData(){
   try{
     if(dataMode === 'main') localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+    const changeText = describeChanges();   // so với lần đồng bộ trước: thêm / sửa / xóa ai
     await pushCloudData();
     await markDraftChangedIfNeeded();
+    if(changeText) logActivity(dataMode === 'draft' ? 'draft' : 'main', changeText);
   }catch(e){
     console.error('Lỗi lưu dữ liệu', e);
     alert('Không lưu được dữ liệu. Trình duyệt có thể đang chặn bộ nhớ cục bộ (chế độ ẩn danh?).');
@@ -2489,12 +2641,12 @@ async function openReviewPanel(){
       const list = ensureToField(allDrafts[uid]);
       const groups = groupByHousehold(list);
       const householdCount = Object.keys(groups).length;
-      const shortUid = uid.slice(0,10) + '…';
+      const shortUid = statusAll[uid].by || (uid.slice(0,10) + '…');
       const t = statusAll[uid].submittedAt ? new Date(statusAll[uid].submittedAt).toLocaleString('vi-VN') : '';
       return `
       <div style="border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-          <div><b>Người nộp (UID):</b> ${escapeHtml(shortUid)} &nbsp; — ${list.length} người trong ${householdCount} hộ ${t ? `&nbsp; · Gửi lúc ${t}` : ''}</div>
+          <div><b>Người nộp:</b> ${escapeHtml(shortUid)} &nbsp; — ${list.length} người trong ${householdCount} hộ ${t ? `&nbsp; · Gửi lúc ${t}` : ''}</div>
           <div style="display:flex;gap:8px;">
             <button class="btn secondary reject-draft-btn" data-uid="${escapeAttr(uid)}">❌ Từ chối</button>
             <button class="btn approve-draft-btn" data-uid="${escapeAttr(uid)}">✅ Duyệt, gộp vào chính</button>
@@ -2531,6 +2683,7 @@ async function approveDraft(uid){
     await firebase.database().ref('sharedData/notifications/' + uid).set({
       type: 'approved', count: draftList.length, at: Date.now()
     });
+    logActivity('approve', 'đã duyệt và gộp ' + draftList.length + ' người từ nháp vào danh sách chính');
     alert('Đã gộp vào danh sách chính. Nháp của người đó đã được xoá và họ sẽ nhận được thông báo.');
     openReviewPanel();
   }catch(err){
@@ -2540,14 +2693,34 @@ async function approveDraft(uid){
 }
 
 async function rejectDraft(uid){
-  if(!confirm('Xoá nháp này? Người nộp sẽ phải nhập lại từ đầu nếu muốn nộp lại.')) return;
+  let info = null;
+  try{ const st = await statusRef(uid).once('value'); info = st.exists() ? st.val() : null; }catch(e){}
+  const who = (info && info.by) ? info.by : 'người này';
+  const count = info && info.count ? info.count : 0;
+  const choice = await askChoice({
+    title: 'Từ chối nháp này?',
+    focus: 'cancel',
+    bodyHtml:
+      `<p>Nháp của <b>${escapeHtml(who)}</b>${count ? ` (${count} người)` : ''} sẽ <b>được giữ nguyên</b> trong mục "Nháp của tôi" của họ — không bị xóa. Họ sẽ nhận thông báo, tự sửa lại rồi gửi duyệt lại, hoặc tự xóa.</p>` +
+      `<label for="rejReason" style="display:block;font-size:12.5px;font-weight:600;margin:10px 0 6px;">Lý do (không bắt buộc — người nộp sẽ đọc được)</label>` +
+      `<textarea id="rejReason" maxlength="300" rows="3" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px;font-size:16px;font-family:inherit;resize:vertical;" placeholder="Ví dụ: Thiếu CCCD của hộ 5, sai năm sinh anh Nam..."></textarea>`,
+    buttons: [
+      { key:'cancel', label:'Hủy', cls:'secondary' },
+      { key:'ok', label:'Từ chối, giữ nháp cho họ' }
+    ]
+  });
+  if(choice !== 'ok') return;
+  const reason = (document.getElementById('rejReason').value || '').trim().slice(0, 300);
   try{
-    await firebase.database().ref('sharedData/drafts/' + uid).remove();
-    await firebase.database().ref('sharedData/draftStatus/' + uid).remove();
-    // Gửi thông báo từ chối cho người nộp
-    await firebase.database().ref('sharedData/notifications/' + uid).set({
-      type: 'rejected', at: Date.now()
+    const now = Date.now();
+    // KHÔNG xóa drafts/<uid>: dữ liệu người nhập vẫn còn. Chỉ đánh dấu "bị từ chối" kèm lý do.
+    await firebase.database().ref('sharedData/draftStatus/' + uid).set({
+      submitted: false, rejected: true, rejectedAt: now, reason: reason, count: count, by: who === 'người này' ? '' : who
     });
+    await firebase.database().ref('sharedData/notifications/' + uid).set({
+      type: 'rejected', at: now, reason: reason, count: count
+    });
+    logActivity('reject', 'đã từ chối nháp của ' + who + (reason ? ' — lý do: ' + reason : '') + ' (nháp được giữ lại cho họ sửa)');
     openReviewPanel();
   }catch(err){
     console.error(err);
@@ -2561,9 +2734,16 @@ function attachNotificationListener(uid){
     if(!snap.exists()) return;
     const notif = snap.val();
     if(notif && notif.type === 'approved'){
-      alert(`✅ Tin vui! Nháp bạn nộp (${notif.count} người) đã được quản trị viên DUYỆT và gộp vào danh sách chính rồi.`);
+      await askChoice({ title:'✅ Nháp đã được duyệt', bodyHtml:`<p>Nháp bạn nộp (<b>${notif.count}</b> người) đã được quản trị viên <b>duyệt</b> và gộp vào danh sách chính.</p>`, buttons:[{key:'ok', label:'Đã hiểu'}] });
     }else if(notif && notif.type === 'rejected'){
-      alert('❌ Nháp bạn nộp đã bị quản trị viên từ chối. Bạn có thể vào "Nháp của tôi" để nhập lại và nộp lại.');
+      const go = await askChoice({
+        title:'❌ Nháp chưa được duyệt',
+        bodyHtml:`<p>Quản trị viên chưa duyệt nháp của bạn${notif.count ? ` (${notif.count} người)` : ''}.</p>` +
+          (notif.reason ? `<p class="choice-warn"><b>Lý do:</b> ${escapeHtml(notif.reason)}</p>` : '') +
+          `<p><b>Dữ liệu của bạn vẫn còn nguyên</b> trong "Nháp của tôi" — sửa lại rồi gửi duyệt lại, hoặc tự xóa nếu không cần.</p>`,
+        buttons:[{key:'later', label:'Để sau', cls:'secondary'}, {key:'open', label:'Mở nháp của tôi'}]
+      });
+      if(go === 'open'){ try{ await switchDataMode('draft'); }catch(e){} }
     }
     // Xoá thông báo sau khi đã hiện, tránh hiện lại mỗi lần mở trang
     try{ await firebase.database().ref('sharedData/notifications/' + uid).remove(); }catch(e){}
@@ -2867,9 +3047,10 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
    ========================================================================= */
 (function(){
   var CLOSE_BTN = { overlay:'cancelBtn', syncOverlay:'closeSyncBtn', exportOverlay:'closeExportBtn',
-                    pendingOverlay:'closePendingBtn', importOverlay:'closeImportBtn', auditOverlay:'closeAuditBtn', toolSheet:'closeToolSheetBtn' };
-  var stack = [];
-  var ignore = 0;
+                    pendingOverlay:'closePendingBtn', importOverlay:'closeImportBtn', auditOverlay:'closeAuditBtn', toolSheet:'closeToolSheetBtn', activityOverlay:'closeActivityBtn' };
+  var stack = [];      // các lớp đang mở: {id, pushed}
+  var ignore = 0;      // số lần popstate do CHÍNH ta gọi history.back() (cần bỏ qua)
+  var flushTimer = null;
 
   function closeLayer(id){
     if(id === 'choiceOverlay'){ window.dispatchEvent(new KeyboardEvent('keydown', {key:'Escape', bubbles:true})); return; }
@@ -2879,15 +3060,29 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   }
   window.closeLayer = closeLayer;
 
+  // Chỉ đẩy mục lịch sử mới khi các lần history.back() trước đó đã xong -> không bị lệch thứ tự
+  function flush(){
+    clearTimeout(flushTimer);
+    if(ignore > 0) return;
+    stack.forEach(function(it){
+      if(!it.pushed){ it.pushed = true; try{ history.pushState({layer:it.id}, ''); }catch(e){} }
+    });
+  }
   function onChange(id, open){
-    var i = stack.indexOf(id);
+    var i = -1;
+    for(var k = 0; k < stack.length; k++){ if(stack[k].id === id){ i = k; break; } }
     if(open && i < 0){
-      stack.push(id);
-      try{ history.pushState({layer:id}, ''); }catch(e){}
+      stack.push({id:id, pushed:false});
+      flush();
     }else if(!open && i >= 0){
-      var wasTop = (i === stack.length - 1);
+      var item = stack[i], wasTop = (i === stack.length - 1);
       stack.splice(i, 1);
-      if(wasTop){ ignore++; try{ history.back(); }catch(e){ ignore--; } }
+      if(item.pushed && wasTop){
+        ignore++;
+        try{ history.back(); }catch(e){ ignore--; }
+        clearTimeout(flushTimer);
+        flushTimer = setTimeout(function(){ ignore = 0; flush(); }, 500);   // phòng khi trình duyệt không báo popstate
+      }
     }
   }
   function watch(id, cls){
@@ -2900,15 +3095,15 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   watch('sidebar', 'mobile-open');
 
   window.layerHandlesPop = function(){
-    if(ignore > 0){ ignore--; return true; }
-    if(stack.length){ var id = stack.pop(); closeLayer(id); return true; }
+    if(ignore > 0){ ignore--; if(ignore === 0) flush(); return true; }
+    if(stack.length){ var it = stack.pop(); closeLayer(it.id); return true; }
     return false;
   };
 
   document.querySelectorAll('.modal-x').forEach(function(b){
     b.addEventListener('click', function(){ closeLayer(b.closest('.overlay').id); });
   });
-  ['syncOverlay','exportOverlay','pendingOverlay','importOverlay','auditOverlay','toolSheet'].forEach(function(id){
+  ['syncOverlay','exportOverlay','pendingOverlay','importOverlay','auditOverlay','toolSheet','activityOverlay'].forEach(function(id){
     var el = document.getElementById(id);
     el.addEventListener('mousedown', function(e){ if(e.target === el) closeLayer(id); });
   });
@@ -3232,5 +3427,111 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   }, 120); });
 })();
 </script>
+
+<script>
+/* =========================================================================
+   THÔNG BÁO HOẠT ĐỘNG: chuông + toast + nhật ký. Dữ liệu đến từ sharedData/activity (Firebase).
+   ========================================================================= */
+(function(){
+  var KEY = 'ho-khau-activity-seen';
+  var bell = document.getElementById('activityBtn'), badge = document.getElementById('activityBadge');
+  var box = document.getElementById('toastBox'), body = document.getElementById('activityBody');
+  var ov = document.getElementById('activityOverlay');
+  var list = [], seen = null, denied = false;
+  var RULES = '"activity": {\n  ".read": "auth != null && root.child(\'sharedData/editors/\' + auth.uid).exists()",\n  "$id": {\n    ".write": "auth != null && root.child(\'sharedData/editors/\' + auth.uid).exists() && (!data.exists() || root.child(\'sharedData/editors/\' + auth.uid).val() === \'admin\')",\n    ".validate": "newData.hasChildren([\'uid\',\'kind\',\'text\',\'at\'])"\n  }\n}';
+  var ICON = {main:'📋', draft:'📝', submit:'📤', approve:'✅', reject:'↩️', login:'🔑'};
+
+  function lastSeen(){ try{ return +localStorage.getItem(KEY) || 0; }catch(e){ return 0; } }
+  function setSeen(v){ try{ localStorage.setItem(KEY, String(v)); }catch(e){} }
+  function isMine(e){ return e.sid ? e.sid === window.SESSION_ID : e.uid === myUid; }   // đúng MÁY này (không phải chỉ cùng tài khoản)
+  function relevant(e){            // thông báo nào cần cho tài khoản này
+    if(isMine(e)) return false;
+    if((e.kind === 'draft' || e.kind === 'login') && myRole !== 'admin') return false;  // nháp & đăng nhập: chỉ quản trị cần biết
+    return true;
+  }
+  function ago(ts){
+    if(!ts) return '';
+    var s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+    if(s < 45) return 'vừa xong';
+    if(s < 3600) return Math.round(s/60) + ' phút trước';
+    if(s < 86400) return Math.round(s/3600) + ' giờ trước';
+    return new Date(ts).toLocaleString('vi-VN');
+  }
+  function unread(){ var ls = lastSeen(); return list.filter(function(e){ return relevant(e) && e.at > ls; }); }
+  function refreshBadge(){
+    var n = unread().length;
+    badge.textContent = n > 99 ? '99+' : String(n);
+    badge.style.display = n ? 'flex' : 'none';
+  }
+  function toast(e){
+    var d = document.createElement('div');
+    d.className = 'toast' + (e.kind === 'reject' ? ' bad' : (e.kind === 'submit' || e.kind === 'draft' ? ' warn' : ''));
+    d.innerHTML = '<span class="t-ico">' + (ICON[e.kind] || '🔔') + '</span><div class="t-main"><b>' + escapeHtml(e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác)' : '') + '</b> ' + escapeHtml(e.text || '') + '<span class="t-time">' + ago(e.at) + '</span></div><button class="t-x" type="button" aria-label="Tắt">&times;</button>';
+    function kill(){ d.classList.add('out'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 260); }
+    d.addEventListener('click', function(ev){ if(ev.target.classList.contains('t-x')){ kill(); return; } kill(); openPanel(); });
+    box.appendChild(d);
+    while(box.children.length > 4) box.removeChild(box.firstChild);
+    setTimeout(kill, 9000);
+    bell.classList.remove('ring'); void bell.offsetWidth; bell.classList.add('ring');
+  }
+  function renderPanel(){
+    if(denied){
+      body.innerHTML = '<div class="rule-box"><b>Chưa bật được nhật ký hoạt động.</b><br>Máy chủ Firebase đang từ chối đọc/ghi mục <code>sharedData/activity</code> vì quy tắc (Rules) chưa có mục này. Quản trị viên vào Firebase Console → Realtime Database → Rules, thêm đoạn sau <b>bên trong</b> mục <code>"sharedData"</code> rồi bấm Publish:<pre>' + escapeHtml(RULES) + '</pre><button class="btn secondary small" id="copyRulesBtn" type="button">Sao chép đoạn quy tắc</button></div>';
+      var cb = document.getElementById('copyRulesBtn');
+      if(cb) cb.addEventListener('click', function(){
+        try{ navigator.clipboard.writeText(RULES).then(function(){ cb.textContent = 'Đã sao chép ✓'; }); }catch(e){ cb.textContent = 'Hãy bôi đen và sao chép thủ công'; }
+      });
+      return;
+    }
+    if(!list.length){ body.innerHTML = '<div class="audit-ok">Chưa có hoạt động nào. Khi có người thêm, sửa hoặc đăng nhập, sẽ hiện ở đây.</div>'; return; }
+    var ls = lastSeen();
+    body.innerHTML = list.slice().reverse().map(function(e){
+      var mine = isMine(e);
+      return '<div class="act-row' + (!mine && relevant(e) && e.at > ls ? ' new' : '') + '"><div class="act-ico">' + (ICON[e.kind] || '🔔') + '</div><div class="act-main"><b>' + escapeHtml(mine ? 'Bạn' : (e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác của bạn)' : '')) + '</b>' + (e.role === 'admin' ? ' <span style="font-size:11px;color:var(--sun-deep);font-weight:700;">QUẢN TRỊ</span>' : '') + ' ' + escapeHtml(e.text || '') + '<div class="act-time">' + escapeHtml(ago(e.at)) + '</div></div></div>';
+    }).join('');
+  }
+  function setStatus(msg, ok){
+    var el = document.getElementById('activityStatus');
+    if(el){ el.textContent = msg; el.style.color = ok ? 'var(--green)' : '#C0392B'; el.style.fontWeight = '600'; }
+  }
+  function openPanel(){ ov.classList.add('show'); renderPanel(); ov.scrollTop = 0; }
+  function markRead(){
+    var mx = list.reduce(function(m, e){ return Math.max(m, e.at || 0); }, lastSeen());
+    setSeen(mx); refreshBadge(); renderPanel();
+  }
+
+  window.activityUI = {
+    reset: function(){ list = []; seen = null; denied = false; bell.style.display = 'none'; badge.style.display = 'none'; },
+    writeOk: function(){ setStatus('✓ Ghi lên máy chủ thành công.', true); },
+    writeError: function(err){ setStatus('✗ Không ghi được lên máy chủ: ' + ((err && (err.code || err.message)) || 'lỗi không rõ') + '. Hãy kiểm tra lại Rules (mục activity) đã Publish chưa.', false); },
+    error: function(err){ denied = true; bell.style.display = ''; badge.style.display = 'none'; },
+    update: function(arr){
+      denied = false;
+      bell.style.display = '';
+      var first = (seen === null);
+      var fresh = [];
+      if(first){ seen = {}; }
+      arr.forEach(function(e){ if(!seen[e.id]){ seen[e.id] = 1; if(!first) fresh.push(e); } });
+      list = arr;
+      if(first && lastSeen() === 0){ setSeen(arr.reduce(function(m,e){ return Math.max(m, e.at||0); }, Date.now())); }  // lần đầu dùng: không báo dồn quá khứ
+      fresh.filter(relevant).forEach(toast);
+      refreshBadge();
+      if(ov.classList.contains('show')) renderPanel();
+    }
+  };
+
+  bell.addEventListener('click', openPanel);
+  document.getElementById('closeActivityBtn').addEventListener('click', function(){ ov.classList.remove('show'); });
+  document.getElementById('activityReadBtn').addEventListener('click', markRead);
+  document.getElementById('activityTestBtn').addEventListener('click', function(){
+    setStatus('Đang gửi thông báo thử…', true);
+    logActivity('main', 'gửi thông báo thử — nếu máy khác thấy dòng này tức là thông báo đang hoạt động');
+  });
+  ov.addEventListener('transitionend', function(){});
+  // thời gian "x phút trước" tự cập nhật khi đang mở bảng
+  setInterval(function(){ if(ov.classList.contains('show')) renderPanel(); }, 30000);
+})();
+</script>
 </body>
 </html>
+
