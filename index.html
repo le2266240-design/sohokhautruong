@@ -760,6 +760,12 @@ body.locked #mainApp{display:none;}
 .name-preview::before{content:"Xem trước: ";font-family:"Be Vietnam Pro",sans-serif;font-size:11.5px;font-weight:500;color:var(--ink-soft);letter-spacing:.3px;}
 @media (max-width:860px){ #fName{font-size:18px !important;} }
 
+
+.act-tabs{display:flex;gap:6px;margin:4px 0 10px;border-bottom:1px solid var(--line);}
+.act-tab{border:none;background:none;padding:9px 14px;font:600 13.5px var(--font-sans,inherit);color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;}
+.act-tab.on{color:var(--teal-deep);border-bottom-color:var(--sun);}
+.act-tab i{font-style:normal;background:#C0392B;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;margin-left:4px;}
+
 /* =========================================================
    PRINT (giữ nguyên định dạng in gốc)
    ========================================================= */
@@ -1146,8 +1152,9 @@ body.locked #mainApp{display:none;}
   <div class="form-card audit-card">
     <button class="modal-x" type="button" aria-label="Đóng">&times;</button>
     <h3 id="activityTitle">Hoạt động gần đây</h3>
-    <p class="audit-sub">Ai vừa thêm, sửa, gửi duyệt, đăng nhập… được báo qua máy chủ, máy nào đang mở cũng thấy. Hiện 80 hoạt động gần nhất.</p>
+    <p class="audit-sub">Ai vừa thêm, sửa… được báo qua máy chủ, máy nào đang mở cũng thấy. Quản trị viên có thêm mục riêng "Quản trị" (đăng nhập, đổi quyền, nháp). Hiện 80 hoạt động gần nhất.</p>
     <div id="activityStatus" class="audit-sub" style="min-height:18px;"></div>
+    <div id="activityTabs" class="act-tabs" style="display:none;"></div>
     <div id="activityBody"></div>
     <div class="form-actions">
       <button class="btn secondary" id="activityTestBtn" type="button">Gửi thông báo thử</button>
@@ -3674,12 +3681,17 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   var RULES = '"activity": {\n  ".read": "auth != null && root.child(\'sharedData/editors/\' + auth.uid).exists()",\n  "$id": {\n    ".write": "auth != null && root.child(\'sharedData/editors/\' + auth.uid).exists() && (!data.exists() || root.child(\'sharedData/editors/\' + auth.uid).val() === \'admin\')",\n    ".validate": "newData.hasChildren([\'uid\',\'kind\',\'text\',\'at\'])"\n  }\n}';
   var ICON = {main:'📋', draft:'📝', submit:'📤', approve:'✅', reject:'↩️', login:'🔑', account:'🔐'};
 
-  function lastSeen(){ try{ return +localStorage.getItem(KEY) || 0; }catch(e){ return 0; } }
-  function setSeen(v){ try{ localStorage.setItem(KEY, String(v)); }catch(e){} }
+  // Thông báo "Quản trị": chỉ quản trị viên thấy (đăng nhập, đổi quyền, nháp, gửi duyệt). Mốc đã-đọc tách riêng.
+  var ADMIN_KINDS = { login:1, account:1, draft:1, submit:1 };
+  var tab = 'all';   // 'all' | 'admin' (chỉ quản trị mới có tab này)
+  function isAdminKind(e){ return !!ADMIN_KINDS[e.kind]; }
+  function keyOf(admin){ return admin ? KEY + '-admin' : KEY; }
+  function lastSeen(admin){ try{ return +localStorage.getItem(keyOf(admin)) || 0; }catch(e){ return 0; } }
+  function setSeen(v, admin){ try{ localStorage.setItem(keyOf(admin), String(v)); }catch(e){} }
   function isMine(e){ return e.sid ? e.sid === window.SESSION_ID : e.uid === myUid; }   // đúng MÁY này (không phải chỉ cùng tài khoản)
   function relevant(e){            // thông báo nào cần cho tài khoản này
     if(isMine(e)) return false;
-    if((e.kind === 'draft' || e.kind === 'login') && myRole !== 'admin') return false;  // nháp & đăng nhập: chỉ quản trị cần biết
+    if(isAdminKind(e) && myRole !== 'admin') return false;  // đăng nhập, đổi quyền, nháp, gửi duyệt: chỉ quản trị thấy
     return true;
   }
   function ago(ts){
@@ -3690,7 +3702,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     if(s < 86400) return Math.round(s/3600) + ' giờ trước';
     return new Date(ts).toLocaleString('vi-VN');
   }
-  function unread(){ var ls = lastSeen(); return list.filter(function(e){ return relevant(e) && e.at > ls; }); }
+  function unread(admin){ return list.filter(function(e){ return relevant(e) && (admin === undefined || isAdminKind(e) === admin) && e.at > lastSeen(isAdminKind(e)); }); }
   function refreshBadge(){
     var n = unread().length;
     badge.textContent = n > 99 ? '99+' : String(n);
@@ -3701,7 +3713,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     d.className = 'toast' + (e.kind === 'reject' ? ' bad' : (e.kind === 'submit' || e.kind === 'draft' ? ' warn' : ''));
     d.innerHTML = '<span class="t-ico">' + (ICON[e.kind] || '🔔') + '</span><div class="t-main"><b>' + escapeHtml(e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác)' : '') + '</b> ' + escapeHtml(e.text || '') + '<span class="t-time">' + ago(e.at) + '</span></div><button class="t-x" type="button" aria-label="Tắt">&times;</button>';
     function kill(){ d.classList.add('out'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 260); }
-    d.addEventListener('click', function(ev){ if(ev.target.classList.contains('t-x')){ kill(); return; } kill(); markUpTo(e.at); openPanel(); });
+    d.addEventListener('click', function(ev){ if(ev.target.classList.contains('t-x')){ kill(); return; } kill(); markUpTo(e.at, isAdminKind(e)); if(isAdminKind(e)) tab = 'admin'; openPanel(); });
     box.appendChild(d);
     while(box.children.length > 4) box.removeChild(box.firstChild);
     setTimeout(kill, 9000);
@@ -3716,10 +3728,25 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
       });
       return;
     }
-    if(!list.length){ body.innerHTML = '<div class="audit-ok">Chưa có hoạt động nào. Khi có người thêm, sửa hoặc đăng nhập, sẽ hiện ở đây.</div>'; return; }
-    var ls = lastSeen();
-    body.innerHTML = list.slice().reverse().map(function(e){
+    var isAdm = (myRole === 'admin');
+    if(!isAdm) tab = 'all';
+    var tabsEl = document.getElementById('activityTabs');
+    if(tabsEl){
+      tabsEl.style.display = isAdm ? 'flex' : 'none';
+      if(isAdm){
+        var nAll = unread(false).length, nAdm = unread(true).length;
+        tabsEl.innerHTML = '<button type="button" class="act-tab' + (tab==='all' ? ' on' : '') + '" data-tab="all">Chung' + (nAll ? ' <i>' + nAll + '</i>' : '') + '</button>' +
+          '<button type="button" class="act-tab' + (tab==='admin' ? ' on' : '') + '" data-tab="admin">🔐 Quản trị' + (nAdm ? ' <i>' + nAdm + '</i>' : '') + '</button>';
+      }
+    }
+    var view = list.filter(function(e){ return isAdm ? (isAdminKind(e) === (tab === 'admin')) : !isAdminKind(e); });
+    if(!view.length){
+      body.innerHTML = '<div class="audit-ok">' + (tab === 'admin' ? 'Chưa có thông báo quản trị nào. Đăng nhập, đổi quyền, nháp và gửi duyệt sẽ hiện riêng ở đây — chỉ quản trị viên thấy.' : 'Chưa có hoạt động nào. Khi có người thêm hoặc sửa danh sách, sẽ hiện ở đây.') + '</div>';
+      return;
+    }
+    body.innerHTML = view.slice().reverse().map(function(e){
       var mine = isMine(e);
+      var ls = lastSeen(isAdminKind(e));
       return '<div class="act-row' + (!mine && relevant(e) && e.at > ls ? ' new' : '') + '" data-at="' + (e.at || 0) + '" style="cursor:pointer;" title="Bấm để đánh dấu đã đọc tới thông báo này"><div class="act-ico">' + (ICON[e.kind] || '🔔') + '</div><div class="act-main"><b>' + escapeHtml(mine ? 'Bạn' : (e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác của bạn)' : '')) + '</b>' + (e.role === 'admin' ? ' <span style="font-size:11px;color:var(--sun-deep);font-weight:700;">QUẢN TRỊ</span>' : '') + ' ' + escapeHtml(e.text || '') + '<div class="act-time">' + escapeHtml(ago(e.at)) + '</div></div></div>';
     }).join('');
   }
@@ -3729,19 +3756,25 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   }
   function openPanel(){ ov.classList.add('show'); renderPanel(); ov.scrollTop = 0; }
   // Bấm vào 1 thông báo = đã đọc thông báo đó và TẤT CẢ thông báo cũ hơn
-  function markUpTo(at){
+  function markUpTo(at, admin){
     at = +at || 0;
-    if(at > lastSeen()){ setSeen(at); refreshBadge(); }
+    if(at > lastSeen(admin)){ setSeen(at, admin); refreshBadge(); }
   }
   document.getElementById('activityBody').addEventListener('click', function(ev){
     var row = ev.target.closest ? ev.target.closest('.act-row') : null;
     if(!row) return;
-    markUpTo(row.getAttribute('data-at'));
+    markUpTo(row.getAttribute('data-at'), tab === 'admin' && myRole === 'admin');
     renderPanel();
   });
+  document.getElementById('activityTabs').addEventListener('click', function(ev){
+    var b = ev.target.closest ? ev.target.closest('.act-tab') : null;
+    if(!b) return;
+    tab = b.getAttribute('data-tab'); renderPanel(); ov.scrollTop = 0;
+  });
   function markRead(){
-    var mx = list.reduce(function(m, e){ return Math.max(m, e.at || 0); }, lastSeen());
-    setSeen(mx); refreshBadge(); renderPanel();
+    var adm = (tab === 'admin' && myRole === 'admin');
+    var mx = list.reduce(function(m, e){ return isAdminKind(e) === adm ? Math.max(m, e.at || 0) : m; }, lastSeen(adm));
+    setSeen(mx, adm); refreshBadge(); renderPanel();
   }
 
   window.activityUI = {
@@ -3757,7 +3790,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
       if(first){ seen = {}; }
       arr.forEach(function(e){ if(!seen[e.id]){ seen[e.id] = 1; if(!first) fresh.push(e); } });
       list = arr;
-      if(first && lastSeen() === 0){ setSeen(arr.reduce(function(m,e){ return Math.max(m, e.at||0); }, Date.now())); }  // lần đầu dùng: không báo dồn quá khứ
+      if(first){ [false, true].forEach(function(a){ if(lastSeen(a) === 0){ setSeen(arr.reduce(function(m,e){ return Math.max(m, e.at||0); }, Date.now()), a); } }); }  // lần đầu dùng: không báo dồn quá khứ
       fresh.filter(relevant).forEach(toast);
       refreshBadge();
       if(ov.classList.contains('show')) renderPanel();
