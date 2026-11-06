@@ -1280,7 +1280,7 @@ let dataMode = 'main'; // 'main' (danh sách chính) | 'draft' (nháp của tôi
 
 function canEditCurrentMode(){
   if(dataMode === 'draft') return true; // nháp của mình luôn sửa được
-  return myRole === 'admin'; // danh sách chính: chỉ admin sửa trực tiếp
+  return myRole === 'admin' || myRole === 'editor'; // danh sách chính: quản trị & biên tập viên sửa trực tiếp
 }
 
 function statusRef(uid){ return firebase.database().ref('sharedData/draftStatus/' + uid); }
@@ -1384,7 +1384,7 @@ async function logActivity(kind, text){
 function logLoginOnce(){
   if(loginLogged) return;
   loginLogged = true;
-  logActivity('login', 'vừa đăng nhập (' + (myRole === 'admin' ? 'quản trị' : 'thành viên') + ')');
+  logActivity('login', 'vừa đăng nhập (' + (myRole === 'admin' ? 'quản trị' : (myRole === 'editor' ? 'biên tập' : 'thành viên')) + ')');
 }
 function attachActivityListener(){
   detachActivityListener();
@@ -1428,8 +1428,10 @@ function updateModeUI(){
   if(dataMode==='main'){
     banner.innerHTML = myRole==='admin'
       ? '📋 Danh sách chính — bạn là quản trị, sửa trực tiếp vào đây.'
+      : myRole==='editor'
+      ? '📋 Danh sách chính — bạn là biên tập viên, thêm/sửa trực tiếp vào đây.'
       : '📋 Danh sách chính — chỉ xem. Muốn thêm/sửa, chuyển sang "📝 Nháp của tôi".';
-    if(addBtn) addBtn.style.display = (myRole==='admin') ? '' : 'none';
+    if(addBtn) addBtn.style.display = (myRole==='admin' || myRole==='editor') ? '' : 'none';
     submitBtn.style.display = 'none';
   }else{
     if(addBtn) addBtn.style.display = '';
@@ -1464,10 +1466,10 @@ async function switchDataMode(mode){
 }
 
 // ===== PHÂN QUYỀN XEM NỘI DUNG (quản trị viên quyết định ai xem được) =====
-// editors/<uid> = 'admin' (toàn quyền) | 'member' (xem danh sách chính + nộp nháp) | 'drafter' (chỉ nộp nháp, KHÔNG xem danh sách chính)
+// editors/<uid> = 'admin' (toàn quyền) | 'editor' (sửa trực tiếp danh sách chính, KHÔNG quản lý tài khoản/duyệt nháp) | 'member' (xem danh sách chính + nộp nháp) | 'drafter' (chỉ nộp nháp, KHÔNG xem danh sách chính)
 // Không có trong editors = chưa cấp quyền: không xem được gì.
-function roleFromValue(v){ return v === 'admin' ? 'admin' : (v === 'drafter' ? 'drafter' : (v ? 'member' : null)); }
-function canViewMain(){ return myRole === 'admin' || myRole === 'member'; }
+function roleFromValue(v){ return v === 'admin' ? 'admin' : (v === 'editor' ? 'editor' : (v === 'drafter' ? 'drafter' : (v ? 'member' : null))); }
+function canViewMain(){ return myRole === 'admin' || myRole === 'editor' || myRole === 'member'; }
 function purgeLocalCache(){
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
   members = []; selectedHousehold = null; selectedTo = '__ALL__';
@@ -1498,9 +1500,10 @@ function watchMyRole(uid){
   }, () => {});
 }
 
-const ROLE_LABEL = { admin:'Quản trị viên', member:'Thành viên', drafter:'Chỉ nộp nháp', none:'Chưa cấp quyền' };
+const ROLE_LABEL = { admin:'Quản trị viên', editor:'Biên tập viên', member:'Thành viên', drafter:'Chỉ nộp nháp', none:'Chưa cấp quyền' };
 const ROLE_DESC = {
   admin:'toàn quyền: xem, sửa danh sách chính, duyệt nháp, quản lý tài khoản',
+  editor:'xem + thêm/sửa/xóa trực tiếp vào danh sách chính; KHÔNG vào được Quản lý tài khoản và duyệt nháp',
   member:'xem danh sách chính + soạn và nộp nháp',
   drafter:'chỉ soạn và nộp nháp, KHÔNG xem được danh sách chính',
   none:'đăng nhập được nhưng không xem được gì'
@@ -1518,7 +1521,7 @@ async function openAccountsPanel(){
     const users = uSnap.exists() ? uSnap.val() : {};
     const editors = eSnap.exists() ? eSnap.val() : {};
     const uids = Array.from(new Set(Object.keys(users).concat(Object.keys(editors))));
-    const order = { none:0, admin:1, member:2, drafter:3 };
+    const order = { none:0, admin:1, editor:2, member:3, drafter:4 };
     const rows = uids.map(uid => {
       const role = roleFromValue(editors[uid]) || 'none';
       const u = users[uid] || {};
@@ -1530,7 +1533,7 @@ async function openAccountsPanel(){
       rows.map(r => {
         const mine = r.uid === myUid;
         const t = r.lastLogin ? new Date(r.lastLogin).toLocaleString('vi-VN') : 'chưa rõ';
-        const opts = ['admin','member','drafter','none'].map(k =>
+        const opts = ['admin','editor','member','drafter','none'].map(k =>
           `<option value="${k}"${k===r.role?' selected':''}>${ROLE_LABEL[k]}</option>`).join('');
         return `<div class="acc-row${r.role==='none'?' pending':''}">
           <div class="acc-who"><b>${escapeHtml(r.email || 'Tài khoản chưa có hồ sơ')}${mine ? ' <span class="acc-me">(bạn)</span>' : ''}</b>
@@ -1627,7 +1630,7 @@ function initFirebase(){
         if(!myRole){
           setSyncStatus('⛔ Tài khoản này chưa được cấp quyền. Liên hệ quản trị viên để được thêm vào danh sách editors.', false);
         }else{
-          setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ') + ' — vai trò: ' + (myRole==='admin' ? 'Quản trị' : 'Thành viên (nộp nháp)'), true);
+          setSyncStatus('Đã đăng nhập: ' + (user.email || 'tài khoản đồng bộ') + ' — vai trò: ' + (myRole==='admin' ? 'Quản trị' : (myRole==='editor' ? 'Biên tập viên (sửa trực tiếp)' : 'Thành viên (nộp nháp)')), true);
           logLoginOnce();
         }
       }else{
@@ -3187,7 +3190,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     var configured = (typeof cloudConfigured !== 'undefined') && cloudConfigured;
     if(ready){
       var role = (typeof myRole !== 'undefined') ? myRole : null;
-      var label = role === 'admin' ? 'Quản trị viên' : (role === 'member' ? 'Thành viên' : 'Chưa được cấp quyền');
+      var label = role === 'admin' ? 'Quản trị viên' : (role === 'editor' ? 'Biên tập viên' : (role === 'member' ? 'Thành viên' : 'Chưa được cấp quyền'));
       pill.classList.add('on');
       pillText.textContent = 'Đã kết nối · ' + label;
     }else{
@@ -3698,7 +3701,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     d.className = 'toast' + (e.kind === 'reject' ? ' bad' : (e.kind === 'submit' || e.kind === 'draft' ? ' warn' : ''));
     d.innerHTML = '<span class="t-ico">' + (ICON[e.kind] || '🔔') + '</span><div class="t-main"><b>' + escapeHtml(e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác)' : '') + '</b> ' + escapeHtml(e.text || '') + '<span class="t-time">' + ago(e.at) + '</span></div><button class="t-x" type="button" aria-label="Tắt">&times;</button>';
     function kill(){ d.classList.add('out'); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 260); }
-    d.addEventListener('click', function(ev){ if(ev.target.classList.contains('t-x')){ kill(); return; } kill(); openPanel(); });
+    d.addEventListener('click', function(ev){ if(ev.target.classList.contains('t-x')){ kill(); return; } kill(); markUpTo(e.at); openPanel(); });
     box.appendChild(d);
     while(box.children.length > 4) box.removeChild(box.firstChild);
     setTimeout(kill, 9000);
@@ -3717,7 +3720,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     var ls = lastSeen();
     body.innerHTML = list.slice().reverse().map(function(e){
       var mine = isMine(e);
-      return '<div class="act-row' + (!mine && relevant(e) && e.at > ls ? ' new' : '') + '"><div class="act-ico">' + (ICON[e.kind] || '🔔') + '</div><div class="act-main"><b>' + escapeHtml(mine ? 'Bạn' : (e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác của bạn)' : '')) + '</b>' + (e.role === 'admin' ? ' <span style="font-size:11px;color:var(--sun-deep);font-weight:700;">QUẢN TRỊ</span>' : '') + ' ' + escapeHtml(e.text || '') + '<div class="act-time">' + escapeHtml(ago(e.at)) + '</div></div></div>';
+      return '<div class="act-row' + (!mine && relevant(e) && e.at > ls ? ' new' : '') + '" data-at="' + (e.at || 0) + '" style="cursor:pointer;" title="Bấm để đánh dấu đã đọc tới thông báo này"><div class="act-ico">' + (ICON[e.kind] || '🔔') + '</div><div class="act-main"><b>' + escapeHtml(mine ? 'Bạn' : (e.actor || 'Một tài khoản') + (e.uid === myUid ? ' (máy khác của bạn)' : '')) + '</b>' + (e.role === 'admin' ? ' <span style="font-size:11px;color:var(--sun-deep);font-weight:700;">QUẢN TRỊ</span>' : '') + ' ' + escapeHtml(e.text || '') + '<div class="act-time">' + escapeHtml(ago(e.at)) + '</div></div></div>';
     }).join('');
   }
   function setStatus(msg, ok){
@@ -3725,6 +3728,17 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
     if(el){ el.textContent = msg; el.style.color = ok ? 'var(--green)' : '#C0392B'; el.style.fontWeight = '600'; }
   }
   function openPanel(){ ov.classList.add('show'); renderPanel(); ov.scrollTop = 0; }
+  // Bấm vào 1 thông báo = đã đọc thông báo đó và TẤT CẢ thông báo cũ hơn
+  function markUpTo(at){
+    at = +at || 0;
+    if(at > lastSeen()){ setSeen(at); refreshBadge(); }
+  }
+  document.getElementById('activityBody').addEventListener('click', function(ev){
+    var row = ev.target.closest ? ev.target.closest('.act-row') : null;
+    if(!row) return;
+    markUpTo(row.getAttribute('data-at'));
+    renderPanel();
+  });
   function markRead(){
     var mx = list.reduce(function(m, e){ return Math.max(m, e.at || 0); }, lastSeen());
     setSeen(mx); refreshBadge(); renderPanel();
