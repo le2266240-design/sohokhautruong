@@ -2071,8 +2071,8 @@ function renderMain(){
       filtered = filtered.filter(m =>
         (m.name||'').toLowerCase().includes(query) ||
         (m.cccd||'').toLowerCase().includes(query) ||
-        (m.phone||'').toLowerCase().includes(query) ||
-        (m.phone||'').replace(/\D/g,'').includes(query.replace(/\D/g,'') || '\u0000') ||
+        phoneOf(m).toLowerCase().includes(query) ||
+        phoneOf(m).replace(/\D/g,'').includes(query.replace(/\D/g,'') || '\u0000') ||
         (m.household||'').toLowerCase().includes(query) ||
         (m.to||'').toLowerCase().includes(query) ||
         (m.year||'').toLowerCase().includes(query)
@@ -2206,7 +2206,7 @@ function memberTable(list, showMeta, canEdit){
         <div class="rc rc-cccd">${m.cccd ? `<span class="record-cccd">${escapeHtml(m.cccd)}</span>` : ''}</div>
         <div class="rc rc-birth">${m.year ? `<span>${escapeHtml(m.year)}</span>` : ''}</div>
         <div class="rc rc-eth">${m.ethnicity ? `<span class="e">${escapeHtml(m.ethnicity)}</span>` : ''}${m.religion ? `<span class="r">${escapeHtml(m.religion)}</span>` : ''}</div>
-        <div class="rc rc-addr">${m.phone ? `<span class="a">${escapeHtml(m.phone)}</span>` : ''}${m.note ? `<span class="record-note">${escapeHtml(m.note)}</span>` : ''}</div>
+        <div class="rc rc-addr">${phoneOf(m) ? `<span class="a">${escapeHtml(phoneOf(m))}</span>` : ''}${m.note ? `<span class="record-note">${escapeHtml(m.note)}</span>` : ''}</div>
         ${showMeta ? `<div class="record-tag">Tổ ${escapeHtml(m.to||'')} — Hộ ${escapeHtml(m.household||'')}</div>` : ''}
       </div>
       ${canEdit ? `<div class="record-actions">
@@ -2307,7 +2307,10 @@ function normVi(str){
   try{ return String(str==null?'':str).normalize('NFC').replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\s{2,}/g,' '); }
   catch(e){ return String(str==null?'':str); }
 }
+// Dữ liệu cũ: số điện thoại từng được ghi vào mục "Địa chỉ" -> vẫn hiện (dùng khi chưa có số điện thoại mới)
+function phoneOf(m){ return (m && (m.phone || m.address)) ? String(m.phone || m.address) : ''; }
 function cleanPhone(str){
+  if(/[A-Za-zÀ-ỹ]/.test(String(str||''))) return String(str).trim();   // có chữ (vd ghi chú cũ): giữ nguyên
   let v = String(str||'').replace(/[^\d+]/g,'');
   if(v.indexOf('+')>0) v = v.replace(/\+/g,'');
   return v;
@@ -2334,7 +2337,7 @@ function openMemberForm(existing){
   document.getElementById('fYear').value = existing ? (existing.year||'') : '';
   document.getElementById('fEthnicity').value = existing ? (existing.ethnicity||'') : '';
   document.getElementById('fReligion').value = existing ? (existing.religion||'') : '';
-  document.getElementById('fPhone').value = existing ? (existing.phone||'') : '';
+  document.getElementById('fPhone').value = existing ? phoneOf(existing) : '';
   updateNamePreview();
   document.getElementById('fNote').value = existing ? (existing.note||'') : '';
   document.getElementById('fIsHead').checked = !!(existing && existing.isHead);
@@ -2400,8 +2403,8 @@ formFieldOrder.forEach((id, idx)=>{
   });
   nameEl.addEventListener('compositionend', updateNamePreview);
   nameEl.addEventListener('blur', ()=>{ nameEl.value = normVi(nameEl.value).trim(); updateNamePreview(); });
-  phoneEl.addEventListener('input', ()=>{ phoneEl.value = phoneEl.value.replace(/[^\d+\s.\-()]/g,''); });
-  phoneEl.addEventListener('blur', ()=>{ phoneEl.value = formatPhone(phoneEl.value); });
+  
+  phoneEl.addEventListener('blur', ()=>{ if(!/[A-Za-zÀ-ỹ]/.test(phoneEl.value)) phoneEl.value = formatPhone(phoneEl.value); });
 })();
 
 // Tự động chèn dấu / khi gõ ngày sinh (vd: gõ 18122004 -> hiện 18/12/2004)
@@ -2427,7 +2430,7 @@ document.getElementById('saveBtn').addEventListener('click', async ()=>{
   const ethnicity = document.getElementById('fEthnicity').value.trim();
   const religion = document.getElementById('fReligion').value.trim();
   const phone = cleanPhone(document.getElementById('fPhone').value);
-  if(phone && !/^\+?\d[\d ]{7,14}$/.test(phone)){
+  if(phone && !/[A-Za-zÀ-ỹ]/.test(phone) && !/^\+?\d[\d ]{7,14}$/.test(phone)){
     alert('Số điện thoại chưa đúng. Hãy nhập 9–11 chữ số (ví dụ 0912 345 678).');
     document.getElementById('fPhone').focus();
     return;
@@ -2637,7 +2640,7 @@ function buildViewOnlyHtml(){
   lines.push('    if(!q) return true;');
   lines.push('    return (String(m.name||"").toLowerCase().indexOf(q)!==-1) ||');
   lines.push('      (String(m.cccd||"").toLowerCase().indexOf(q)!==-1) ||');
-  lines.push('      (String(m.phone||"").toLowerCase().indexOf(q)!==-1) ||');
+  lines.push('      (String(m.phone||m.address||"").toLowerCase().indexOf(q)!==-1) ||');
   lines.push('      (String(m.household||"").toLowerCase().indexOf(q)!==-1) ||');
   lines.push('      (String(m.to||"").toLowerCase().indexOf(q)!==-1) ||');
   lines.push('      (String(m.year||"").toLowerCase().indexOf(q)!==-1);');
@@ -2652,7 +2655,7 @@ function buildViewOnlyHtml(){
   lines.push('  document.getElementById("count").textContent = list.length + " nguoi";');
   lines.push('  var html = "<table><thead><tr><th>To</th><th>Ho</th><th>Ho va ten</th><th>So CCCD</th><th>Ngay sinh</th><th>Dan toc</th><th>Ton giao</th><th>So dien thoai</th><th>Ghi chu</th></tr></thead><tbody>";');
   lines.push('  list.forEach(function(m){');
-  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + (m.isHead ? " (Chu ho)" : "") + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.ethnicity) + "</td><td>" + esc(m.religion) + "</td><td>" + esc(m.phone) + "</td><td>" + esc(m.note) + "</td></tr>";');
+  lines.push('    html += "<tr><td>" + esc(m.to) + "</td><td>" + esc(m.household) + "</td><td>" + esc(m.name) + (m.isHead ? " (Chu ho)" : "") + "</td><td>" + esc(m.cccd) + "</td><td>" + esc(m.year) + "</td><td>" + esc(m.ethnicity) + "</td><td>" + esc(m.religion) + "</td><td>" + esc(m.phone||m.address) + "</td><td>" + esc(m.note) + "</td></tr>";');
   lines.push('  });');
   lines.push('  html += "</tbody></table>";');
   lines.push('  document.getElementById("tableArea").innerHTML = list.length ? html : "<p>Khong tim thay ket qua.</p>";');
@@ -3134,7 +3137,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
               <td>${escapeHtml(m.year||'')}</td>
               <td>${escapeHtml(m.ethnicity||'')}</td>
               <td>${escapeHtml(m.religion||'')}</td>
-              <td>${escapeHtml(m.phone||'')}</td>
+              <td>${escapeHtml(phoneOf(m))}</td>
               <td>${escapeHtml(m.note||'')}</td>
             </tr>`).join('')}
           </tbody>
@@ -3257,7 +3260,7 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
           '<td>' + escapeHtml(m.year||'') + '</td>' +
           '<td>' + escapeHtml(m.ethnicity||'') + '</td>' +
           '<td>' + escapeHtml(m.religion||'') + '</td>' +
-          '<td>' + escapeHtml(m.phone||'') + '</td>' +
+          '<td>' + escapeHtml(phoneOf(m)) + '</td>' +
           '<td>' + escapeHtml(m.note||'') + '</td></tr>';
       }).join('') +
       '</tbody></table>';
